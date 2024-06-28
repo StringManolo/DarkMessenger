@@ -18,6 +18,12 @@ handle_request() {
     echo -e "\r\n\r\n"
 }
 
+if [ -v $1 ]; then
+  WEB_GUI_PORT=$1
+else
+  WEB_GUI_PORT='9080'
+fi
+
 running=true 
 # Listen on port 9080 using BusyBox netcat (nc)
 while $running; do
@@ -26,7 +32,7 @@ while $running; do
     exit
   else
     # Accept incoming connection and handle request
-    handle_request | nc -l -p 9080 >> "./logs/gui_server.log" 2>&1
+    handle_request | nc -l -p "$WEB_GUI_PORT" >> "./logs/gui_server.log" 2>&1
   fi
 done
 

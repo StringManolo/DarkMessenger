@@ -11,7 +11,7 @@ stop_gui_server() {
     kill "$pid"  
     rm "$PID_FILE" 
     # Make sure to run the loop by calling the server so it can exit
-    curl "http://127.0.0.1:$WEB_GUI_PORT" > /dev/null 2>&1 
+    curl "http://127.0.0.1:$WEB_GUI_PORT" > /dev/null 2>&1
   else
     echo "Server not running."
   fi

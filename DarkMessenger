@@ -9,6 +9,13 @@ else
   echo 'Starting with default config. Edit ./config/DarkMessenger.config if you want custom config'
 fi
 
+if [ "$1" == "stop" ]; then
+   source scripts/servers/web_gui/server_functions.sh
+   stop_gui_server
+   exit
+fi
+
+
 if [ -v USE_WEB_GUI ]; then
   if [ ! -v WEB_GUI_PORT ]; then
     WEB_GUI_PORT=9080;
@@ -17,8 +24,3 @@ if [ -v USE_WEB_GUI ]; then
   start_gui_server;
 fi
 
-# Argument handling
-if [ "$1" == "stop" ]; then
-  source scripts/servers/web_gui/server_functions.sh
-  stop_gui_server
-fi
