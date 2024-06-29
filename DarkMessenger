@@ -1,31 +1,56 @@
 #!/usr/bin/env bash
 
-# File path to store the PID of the gui server process
-PID_FILE="scripts/servers/web_gui/server.pid"
-TOR_PID_FILE="scripts/tor/tor.pid"
-
-if [[ -f config/DarkMessenger.config ]]; then
-  source ./config/DarkMessenger.config
-else
-  echo 'Starting with default config. Edit ./config/DarkMessenger.config if you want custom config'
+if [[ ! -L /bin/dm ]]; then
+  ln -s $(pwd)/DarkMessenger /bin/dm
+  ln -s $(pwd)/DarkMessenger /bin/DarkMessenger
+  ln -s $(pwd)/DarkMessenger /bin/darkmessenger
 fi
 
-source scripts/tor/tor_functions.sh
+# Absolute path to the parent folder of this script
+DM_DIR=$(dirname "$(readlink -f /bin/dm)")
+
+# File path to store the PID of the gui server process
+PID_FILE="$DM_DIR/scripts/servers/web_gui/server.pid"
+TOR_PID_FILE="$DM_DIR/scripts/tor/tor.pid"
+
+if [[ -f "$DM_DIR/config/DarkMessenger.config" ]]; then
+  source "$DM_DIR/config/DarkMessenger.config"
+else
+  echo "Starting with default config. Edit $DM_DIR/config/DarkMessenger.config if you want custom config"
+fi
+
+source "$DM_DIR/scripts/tor/tor_functions.sh"
 
 if [ "$1" == "stop" ]; then
-   source scripts/servers/web_gui/server_functions.sh
+   source "$DM_DIR/scripts/servers/web_gui/server_functions.sh"
    stop_gui_server
    stop_tor
    exit
 fi
 
+
+if [[ ! -f /etc/tor/torrc ]]; then
+  if [ ! -v HIDDEN_SERVICE_PORT ]; then
+    HIDDEN_SERVICE_PORT=9443
+  fi
+  HIDDEN_SERVICE_ABS_PATH="$DM_DIR/scripts/servers/hidden_service/hidden_service_files"
+  echo -e "HiddenServiceDir $HIDDEN_SERVICE_ABS_PATH\nHiddenServicePort $HIDDEN_SERVICE_PORT 127.0.0.1:$HIDDEN_SERVICE_PORT" >> /etc/tor/torrc
+else
+  # TODO: Make sure torrc includes the hidden service here
+  echo 'Reading /etc/tor/torrc...'
+fi
+
 start_tor;
+
+source "$DM_DIR/scripts/servers/hidden_service/server_functions.sh"
+
+start_hidden_service_server;
 
 if [ -v USE_WEB_GUI ]; then
   if [ ! -v WEB_GUI_PORT ]; then
     WEB_GUI_PORT=9080;
-  fi
-  source scripts/servers/web_gui/server_functions.sh
+  fi 
+  source "$DM_DIR/scripts/servers/web_gui/server_functions.sh"
   start_gui_server;
 fi
 
