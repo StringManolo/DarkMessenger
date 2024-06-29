@@ -2,6 +2,7 @@
 
 # File path to store the PID of the gui server process
 PID_FILE="scripts/servers/web_gui/server.pid"
+TOR_PID_FILE="scripts/tor/tor.pid"
 
 if [[ -f config/DarkMessenger.config ]]; then
   source ./config/DarkMessenger.config
@@ -9,12 +10,16 @@ else
   echo 'Starting with default config. Edit ./config/DarkMessenger.config if you want custom config'
 fi
 
+source scripts/tor/tor_functions.sh
+
 if [ "$1" == "stop" ]; then
    source scripts/servers/web_gui/server_functions.sh
    stop_gui_server
+   stop_tor
    exit
 fi
 
+start_tor;
 
 if [ -v USE_WEB_GUI ]; then
   if [ ! -v WEB_GUI_PORT ]; then
@@ -23,4 +28,5 @@ if [ -v USE_WEB_GUI ]; then
   source scripts/servers/web_gui/server_functions.sh
   start_gui_server;
 fi
+
 

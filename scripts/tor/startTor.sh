@@ -1,3 +1,0 @@
-# Starts tor
-
-tor 
