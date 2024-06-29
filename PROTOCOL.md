@@ -3,11 +3,14 @@
 Protocol is not http (but is browser compatible). It uses a custom protocol.
 
 ### Methods
-##### ACK_ME [name]
+##### ACK_ME [name] [origin-address]
 Send your name to another online user.  
 Your name is an alias you want people save you as in their contact list  
   
-If the other user is online he will automatically respond with another ACK_ME to confirm he added you to his contacts
+If the other user is online he will automatically respond with ACK_YOU to confirm he added you to his contacts and asking for your address
+
+##### ACK_YOU [name] [origin-address]
+Send your name and address to an ACK_ME requesting user so he can add you back.
 
 ##### USE_ENCRYPTION [cryto-used] [your_pub_key]
 You send your pubkey, then the other user will send his.  
