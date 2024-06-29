@@ -13,6 +13,7 @@ DM_DIR=$(dirname "$(readlink -f /bin/dm)")
 # File path to store the PID of the gui server process
 PID_FILE="$DM_DIR/scripts/servers/web_gui/server.pid"
 TOR_PID_FILE="$DM_DIR/scripts/tor/tor.pid"
+HIDDEN_SERVICE_PID_FILE="$DM_DIR/scripts/servers/hidden_service/server.pid"
 
 if [[ -f "$DM_DIR/config/DarkMessenger.config" ]]; then
   source "$DM_DIR/config/DarkMessenger.config"

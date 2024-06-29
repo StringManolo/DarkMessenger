@@ -5,3 +5,4 @@
 - Create hidden_service server
   - Read rquests to manage endpoints
   - Create/Design the protocol (prob not using http (prob giving each line a meanning)
+  - Add ack_you, etc 
