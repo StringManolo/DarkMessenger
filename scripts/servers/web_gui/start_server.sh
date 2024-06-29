@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+DM_DIR=$(dirname "$(readlink -f /bin/dm)")
+
 # Function to handle HTTP requests
 handle_request() {
     local content_type="text/html"
-    local content_length=$(wc -c < ./scripts/web/index.html)
+    local content_length=$(wc -c < "$DM_DIR/scripts/web/index.html")
 
     # Construct HTTP response headers
     response="HTTP/1.1 200 OK\r\n"
@@ -14,7 +16,7 @@ handle_request() {
 
     # Send HTTP response headers and content
     echo -e "$response"
-    cat ./scripts/web/index.html
+    cat "$DM_DIR/scripts/web/index.html"
     echo -e "\r\n\r\n"
 }
 
@@ -27,12 +29,12 @@ fi
 running=true 
 # Listen on port 9080 using BusyBox netcat (nc)
 while $running; do
-  if [[ ! -f scripts/servers/web_gui/server.pid ]]; then
+  if [[ ! -f "$DM_DIR/scripts/servers/web_gui/server.pid" ]]; then
     running=false;
     exit
   else
     # Accept incoming connection and handle request
-    handle_request | nc -l -p "$WEB_GUI_PORT" >> "./logs/gui_server.log" 2>&1
+    handle_request | nc -l -p "$WEB_GUI_PORT" >> "$DM_DIR/logs/gui_server.log" 2>&1
   fi
 done
 

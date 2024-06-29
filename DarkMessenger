@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Create symlinks (commands) to call this program
 if [[ ! -L /bin/dm ]]; then
   ln -s $(pwd)/DarkMessenger /bin/dm
   ln -s $(pwd)/DarkMessenger /bin/DarkMessenger
