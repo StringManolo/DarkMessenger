@@ -30,6 +30,7 @@ handle_request() {
           echo "UNKNOWN_REQUEST"
           break
         fi
+      ;;
 
       ACK_YOU)
         if [ "$goodbye" == "GOODBYE" ]; then
@@ -38,12 +39,13 @@ handle_request() {
         else
           echo "UNKNOWN_REQUEST"
         fi
-
+        echo "UNKNOWN_COMMAND"
+        break
       ;;
 
-      ;;
       *)
         echo "UNKNOWN_COMMAND"
+        break
       ;;
     esac
   done
