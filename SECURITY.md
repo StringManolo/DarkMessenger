@@ -1,0 +1,6 @@
+- Add a check method to confirm the provided onion address is right before adding it to the address_book/list.txt to avoid list.txt corruption
+- Add a timeout per connection to avoid DOS
+- Check line size before readding to avoid DOS. (hidden_server)
+- Check line has intented number of spaces. (hidden_server)
+- Check line has only valid chars to avoid req splitting/injection (hidden_server)
+- Rate limit METHODS per client to avoid DOS
