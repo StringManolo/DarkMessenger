@@ -5,6 +5,10 @@ DM_DIR=$(dirname "$(readlink -f /bin/dm)")
 source "$DM_DIR/config/DarkMessenger.config"
 # source "$DM_DIR/scripts/protocol/protocol_functions.sh"
 
+if [ -z "${USERNAME}" ]; then
+   USERNAME="UNKNOWN"
+fi
+
 handle_ack_me() {
   local remote_username="$1"
   local remote_address="$2"
@@ -26,6 +30,17 @@ handle_request() {
           echo "UNKNOWN_REQUEST"
           break
         fi
+
+      ACK_YOU)
+        if [ "$goodbye" == "GOODBYE" ]; then
+          #handle_ack_you "$username" "$address"
+          echo "handle_ack_you not implemented yet"
+        else
+          echo "UNKNOWN_REQUEST"
+        fi
+
+      ;;
+
       ;;
       *)
         echo "UNKNOWN_COMMAND"

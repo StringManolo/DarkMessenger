@@ -7,14 +7,16 @@ start_hidden_service_server() {
 }
 
 
-stop_gui_server() {
-  if [[ -f "$PID_FILE" ]]; then
-    pid=$(cat "$PID_FILE")
+stop_hidden_service_server() {
+  if [[ -f "$HIDDEN_SERVICE_PID_FILE" ]]; then
+    pid=$(cat "$HIDDEN_SERVICE_PID_FILE")
     kill "$pid"
-    rm "$PID_FILE"
+    rm "$HIDDEN_SERVICE_PID_FILE"
+
     # Make sure to run the loop by calling the server so it can exit
-    curl "http://127.0.0.1:$WEB_GUI_PORT" > /dev/null 2>&1
+    HIDDEN_SERVICE_HOSTNAME='127.0.0.1' # TODO: Remove this line. Here for local debug
+    curl "http://$HIDDEN_SERVICE_HOSTNAME:$HIDDEN_SERVICE_PORT" > /dev/null 2>&1
   else
-    echo "Server not running."
+    echo "Hidden Server not running."
   fi
 }
