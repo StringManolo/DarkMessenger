@@ -21,6 +21,6 @@ ACK_ME() {
     REMOTE_PORT=9443 # default hidden_service port
   fi
 
-  echo -e "ACK_ME $MY_ALIAS" | torsocks nc "$REMOTE_ADDRESS" "$REMOTE_PORT" 
+  echo -e "ACK_ME $MY_ALIAS GOODBYE\r\n\r\n" | torsocks nc "$REMOTE_ADDRESS" "$REMOTE_PORT" 
 }
 
