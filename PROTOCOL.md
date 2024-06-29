@@ -32,6 +32,9 @@ Send a message to your destination.
 ##### STATUS
 Ask the user if he is online
 
+##### TEST [message]
+Send a random message and wait for a similar response.  
+
 ### Specifics
 ##### GOODBYE\r\n\r\n
 Indicates the end of the request

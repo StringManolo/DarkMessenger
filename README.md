@@ -6,5 +6,6 @@ Chat App
 ## Requeriments
 - Linux (or termux)
 - Tor
+- torsocks
 - Gpg (gnupg)
 - nc

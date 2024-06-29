@@ -54,4 +54,9 @@ if [ -v USE_WEB_GUI ]; then
   start_gui_server;
 fi
 
+if [[ -f "$DM_DIR/scripts/servers/hidden_service/hidden_service_files/hostname" ]]; then
+  echo "Your address is $(cat $DM_DIR/scripts/servers/hidden_service/hidden_service_files/hostname)";
+fi
 
+# source "$DM_DIR/scripts/protocol/protocol_functions.sh"
+# ACK_ME StringManolo 127.0.0.1 9443
