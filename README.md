@@ -8,4 +8,4 @@ Chat App
 - Tor
 - torsocks
 - Gpg (gnupg)
-- nc
+- ncat (also known as nmap-ncat)
