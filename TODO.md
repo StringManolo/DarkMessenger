@@ -19,3 +19,8 @@
 
 - Test
   - Add testing for all servers/endpoints/methods
+
+- CLI
+  - Add cli commands
+    - Regen Hidden_Service domain option
+
