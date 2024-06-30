@@ -11,6 +11,6 @@ while $running; do
     exit
   else
     # Accept incoming connection and handle request
-    nc -l 127.0.0.1 -p "$TRANSLATOR_PORT" -e "$DM_DIR/scripts/servers/hidden_service/handle_request.sh"
+    nc -l 127.0.0.1 -p "$TRANSLATOR_PORT" -e "$DM_DIR/scripts/servers/http2dmproto/handle_request.sh" 
   fi
 done

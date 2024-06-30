@@ -13,14 +13,19 @@ handle_ack_me() {
   local remote_username="$1"
   local remote_address="$2"
   # TODO: Save in local
-  echo -e "$remote_username $remote_address" >> $DM_DIR/address_book/list.txt
+  echo -e "$remote_username $remote_address" >> "$DM_DIR/address_book/list.txt"
 
   echo -e "ACK_YOU $USERNAME $HIDDEN_SERVICE_HOSTNAME GOODBYE"
 }
 
 # Function to handle requests
 handle_request() {
-  while IFS=' ' read -r command username address goodbye; do
+  while IFS='' read -r line; do
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - Request received: $line" >> "$DM_DIR/logs/hidden_service_server.log"
+
+    local command username address goodbye
+    read -r command username address goodbye <<< "$line"
+
     case "$command" in
       ACK_ME)
         if [ "$goodbye" == "GOODBYE" ]; then
@@ -39,7 +44,6 @@ handle_request() {
         else
           echo "UNKNOWN_REQUEST"
         fi
-        echo "UNKNOWN_COMMAND"
         break
       ;;
 
@@ -48,10 +52,12 @@ handle_request() {
         break
       ;;
     esac
+
   done
 }
 
-echo "$(date +'%Y-%m-%d %H:%M:%S') - Request received: $@" >> "$DM_DIR/logs/hidden_service_server.log"
+# Main execution starts here
+echo "$(date +'%Y-%m-%d %H:%M:%S') - Service started" >> "$DM_DIR/logs/hidden_service_server.log"
 
 handle_request
 

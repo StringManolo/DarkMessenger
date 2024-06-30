@@ -10,16 +10,27 @@ fi
 HIDDEN_SERVICE_HOSTNAME='127.0.0.1' # TODO: Remove this line. local debub line
 
 handle_request() {
-  while IFS= read -r line; do
-    [[ "$line" =~ ^Content-Length:\ ([0-9]+) ]] && length=${BASH_REMATCH[1]}
-    [[ -z "$line" ]] && break
-  done
+  local length=0
+  request=$(cat)
 
-  # Leer el cuerpo de la petición
-  body=$(dd bs=1 count=$length 2>/dev/null)
+  local body=$(echo "$request" | tail -n 1)
 
-  # Enviar el cuerpo al servidor de destino usando ncat
-  echo -n "$body" | ncat "$HIDDEN_SERVICE_HOSTNAME" "$HIDDEN_SERVICE_PORT"
+  # Log
+  echo "echo \"$body\" | nc \"$HIDDEN_SERVICE_HOSTNAME\" \"$HIDDEN_SERVICE_PORT\"" >> "$DM_DIR/logs/http2dmproto_request_to_hidden.log"
+
+
+  local response=$(echo -e "$body" | nc "$HIDDEN_SERVICE_HOSTNAME" "$HIDDEN_SERVICE_PORT" )
+
+  local http_response="HTTP/1.1 200 OK\r\n"
+  http_response+="Content-Type: text/plain\r\n"  
+  http_response+="Content-Length: ${#length}\r\n"
+  http_response+="Connection: close\r\n" 
+  http_response+="\r\n"
+  http_response+="$body"
+  http_response+="\r\n\r\n"
+
+  echo "$http_response";
+  return
 }
 
 handle_request
