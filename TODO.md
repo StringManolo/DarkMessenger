@@ -6,3 +6,9 @@
   - Read rquests to manage endpoints
   - Create/Design the protocol (prob not using http (prob giving each line a meanning)
   - Add ack_you, etc 
+  - log
+  - avoid duplicates in address_book/list.txt
+
+
+- Config
+  - Option to control what servers make logs and log names

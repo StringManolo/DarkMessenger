@@ -51,5 +51,7 @@ handle_request() {
   done
 }
 
+echo "$(date +'%Y-%m-%d %H:%M:%S') - Request received: $@" >> "$DM_DIR/logs/hidden_service_server.log"
+
 handle_request
 

@@ -14,6 +14,7 @@ DM_DIR=$(dirname "$(readlink -f /bin/dm)")
 PID_FILE="$DM_DIR/scripts/servers/web_gui/server.pid"
 TOR_PID_FILE="$DM_DIR/scripts/tor/tor.pid"
 HIDDEN_SERVICE_PID_FILE="$DM_DIR/scripts/servers/hidden_service/server.pid"
+TRANSLATOR_PID_FILE="$DM_DIR/scripts/servers/http2dmproto/server.pid"
 
 if [[ -f "$DM_DIR/config/DarkMessenger.config" ]]; then
   source "$DM_DIR/config/DarkMessenger.config"
@@ -22,11 +23,14 @@ else
 fi
 
 source "$DM_DIR/scripts/tor/tor_functions.sh"
-
+source "$DM_DIR/scripts/servers/hidden_service/server_functions.sh"
+source "$DM_DIR/scripts/servers/http2dmproto/server_functions.sh"
 if [ "$1" == "stop" ]; then
    source "$DM_DIR/scripts/servers/web_gui/server_functions.sh"
    stop_gui_server
    stop_tor
+   stop_hidden_service_server
+   stop_http_to_dmproto_server
    exit
 fi
 
@@ -43,9 +47,6 @@ else
 fi
 
 start_tor;
-
-source "$DM_DIR/scripts/servers/hidden_service/server_functions.sh"
-
 start_hidden_service_server;
 
 if [ -v USE_WEB_GUI ]; then
@@ -54,6 +55,7 @@ if [ -v USE_WEB_GUI ]; then
   fi 
   source "$DM_DIR/scripts/servers/web_gui/server_functions.sh"
   start_gui_server;
+  start_http_to_dmproto_server;
 fi
 
 if [[ -f "$DM_DIR/scripts/servers/hidden_service/hidden_service_files/hostname" ]]; then

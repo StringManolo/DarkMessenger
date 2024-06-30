@@ -1,6 +1,6 @@
-# PROTOCOL 
+# PROTOCOuL 
 
-Protocol is not http (but is browser compatible). It uses a custom protocol.
+Protocol _dmproto_ is a custom protocol
 
 ### Methods
 ##### ACK_ME [name] [origin-address] GOODBYE

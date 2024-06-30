@@ -29,8 +29,6 @@ while $running; do
     exit
   else
     # Accept incoming connection and handle request
-    # { echo "$request" | handle_request; } | nc -l 127.0.0.1 -p "$HIDDEN_SERVICE_PORT" >> "$DM_DIR/logs/hidden_service_server.log" 2>&1
-    #nc -l -p "$HIDDEN_SERVICE_PORT" -e /bin/bash -c "$(declare -f handle_request); handle_request"
     nc -l -p "$HIDDEN_SERVICE_PORT" -e "$DM_DIR/scripts/servers/hidden_service/handle_request.sh"
   fi
 done

@@ -19,5 +19,27 @@
 </head>
 <body>
   <h1>Dark Messenger</h1>
+  <button onclick="sendMessage()">Enviar Mensaje</button>
+  <script>
+    function showAlert(message) {
+      alert(message);
+    }
+
+    function sendMessage() {
+      const message = 'ACK_ME arturo TEST.ONION GOODBYE';
+
+      fetch('http://127.0.0.1:9081', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain'
+        },
+        body: message
+      })
+      .then(response => response.text())
+      .then(data => showAlert('Respuesta del servidor: ' + data))
+      .catch(error => showAlert('Error: ' + error.message));
+    }
+  </script>
 </body>
 </html>
+
