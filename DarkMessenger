@@ -31,9 +31,20 @@ if [ "$1" == "stop" ]; then
    stop_tor
    stop_hidden_service_server
    stop_http_to_dmproto_server
+   rm "$DM_DIR/.DarkMessengerRunning" > /dev/null 2>&1
    exit
 fi
 
+if [[ -f "$DM_DIR/.DarkMessengerRunning" ]]; then
+  echo "Already running, restarting..."
+  source "$DM_DIR/scripts/servers/web_gui/server_functions.sh"
+  stop_gui_server
+  stop_tor
+  stop_hidden_service_server
+  stop_http_to_dmproto_server
+fi
+
+echo '1' > "$DM_DIR/.DarkMessengerRunning"
 
 if [[ ! -f /etc/tor/torrc ]]; then
   if [ ! -v HIDDEN_SERVICE_PORT ]; then

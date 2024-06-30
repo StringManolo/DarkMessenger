@@ -17,4 +17,3 @@
 
 - Bugs
   - Fix not extracting POST request body from scripts/servers/http2dmproto/handle_request.sh
-  - Fix handling inn./DarkMessenger stop

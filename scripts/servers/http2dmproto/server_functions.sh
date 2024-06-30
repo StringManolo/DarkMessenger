@@ -12,7 +12,7 @@ stop_http_to_dmproto_server() {
     kill "$pid"
     rm "$TRANSLATOR_PID_FILE"
     # Make sure to run the loop by calling the server so it can exit
-    curl "http://127.0.0.1:$TRANSLATOR_PORT" > /dev/null 2>&1
+    curl --max-time 0.5 "http://127.0.0.1:$TRANSLATOR_PORT" > /dev/null 2>&1
   else
     echo "translator server not running."
   fi
