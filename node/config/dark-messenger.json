@@ -1,0 +1,12 @@
+{
+  "username": "StringManolo",
+  "use_web_gui": "true",
+  "web_gui_address": "127.0.0.1",
+  "web_gui_port": "9000",
+  "hidden_service_hostname": "127.0.0.1",
+  "hidden_service_port": "9001",
+
+
+  "verbose": "true",
+  "debug": "true"
+}

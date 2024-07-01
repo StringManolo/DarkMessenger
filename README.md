@@ -1,11 +1,2 @@
-# DarkMessenger
-Chat App
-
-## If you read this, this software is in development. Come later :D
-
-## Requeriments
-- Linux (or termux)
-- Tor
-- torsocks
-- Gpg (gnupg)
-- ncat (also known as nmap-ncat)
+# Come back later
+This software is in early development (not working yet)
