@@ -39,7 +39,18 @@ const verbose = msg => {
 
 const debug = msg => {
   if (d || config?.debug) {
-    console.log(`${chalk.blue("[DEBUG]")} ${msg}`);
+
+    if (config?.debug_with_time) {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
+      const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+      console.log(`${chalk.blue("[DEBUG-" + timestamp + "]")} ${msg}`);
+    } else {
+      console.log(`${chalk.blue("[DEBUG]")} ${msg}`);
+    }
   }
 };
 
@@ -112,10 +123,16 @@ const start = async (cli) => {
   debug("Debug Activated");
 
   if (config) {
+    debug(`Checking if use_web_gui is true`);
     if (config?.use_web_gui) {
+      debug(`Generating GUI Server source code ...`);
       const guiServerScript = generateGuiServerScript(config);
+      debug(`GUI Server code generated:\n${guiServerScript}\n`);
+      debug(`Creating ./startGuiServer.js file ...`);
       await writeGuiServerScript(guiServerScript);
+      debug(`Calling startGuiServer() ...`);
       startGuiServer();
+      debug(`Call done`);
     } else {
       debug(`Not using Web GUI, to activate it add next options to your ./config/dark-messenger.json file:\n"use_web_gui": "true",\n"web_gui_address": "127.0.0.1",\n"web_gui_port": "9000",`);
     }
@@ -202,7 +219,6 @@ const generateGuiServerScript = (config) => {
 
 const writeGuiServerScript = async (scriptContent) => {
   try {
-    debug("Creating ./startGuiServer.js ...");
     await fs.promises.writeFile('./startGuiServer.js', scriptContent);
     verbose('startGuiServer.js file has been created successfully.');
   } catch (err) {
@@ -211,8 +227,6 @@ const writeGuiServerScript = async (scriptContent) => {
 };
 
 const startGuiServer = () => {
-  verbose("Starting GUI server ...");
-  
   debug(`Running chmod 775 over ./startGuiServer.js ... `);
   fs.chmod("./startGuiServer.js", 0o775, (err) => {
     if (err) {
