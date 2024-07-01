@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
-import { promises as fs } from 'fs';
-import path from 'path';
-import parseCLI from 'simpleargumentsparser';
+import { promises as fs } from "fs";
+// import path from 'path';
+import { spawn } from "child_process";
+import parseCLI from "simpleargumentsparser";
 import chalk from "chalk";
+
 
 //globals
 let v = false; //verbose
@@ -51,6 +53,33 @@ const debug = msg => {
   }
 }
 
+const error = msg => {
+  console.log(`${chalk.red("[ERROR]")} ${msg}`);
+}
+
+const startTor = () => {
+  verbose(`Starting Tor ...`);
+  const process = spawn("/usr/bin/tor",  ["-f", "./config/torrc.conf" ]);
+    
+  process.stdout.on('data', (data) => {
+    debug(`Tor stdout: ${data}`);
+  });
+
+  process.stderr.on('data', (data) => {
+    error(`Tor stderr: ${data}`);
+  });
+
+  process.on('error', (err) => {
+    error(`Error Starting Tor: ${err}`);
+  });
+
+  process.on("close", (code) => {
+    verbose(`Closing Tor ...`);
+    debug(`Tor process closing with code: ${code}`);
+  });
+}
+
+
 const start = async (cli) => {
   if (cli.c.config) {
     if (typeof cli.c.config === "string") {
@@ -69,6 +98,8 @@ const start = async (cli) => {
 
   verbose("Verbose Activated");
   debug("Debug Activated");
+
+  startTor();
 }
 
 const stop = () => {
@@ -80,7 +111,7 @@ const loadFile = async (path) => {
     const data = await fs.readFile(path, "utf8");
     return data;
   } catch (err) {
-    console.error(`Unable to read ${path}: ${err}`)
+    error(`Unable to read ${path}: ${err}`)
     throw err;
   }
 }
@@ -90,7 +121,7 @@ const loadConfig = async (path) => {
     const file = await loadFile(path);
     return JSON.parse(file);
   } catch (err) {
-    console.error(`Unable to load config ${path} as JSON: ${err}`)
+    error(`Unable to load config ${path} as JSON: ${err}`)
   }
 }
 
