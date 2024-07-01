@@ -1,1 +1,2 @@
 - Make sure multiple start commands in a row don't make unintended errors
+- Move ./GUI/index.html to index.js to control hostname, port and other config
