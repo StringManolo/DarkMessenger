@@ -39,7 +39,6 @@ const verbose = msg => {
 
 const debug = msg => {
   if (d || config?.debug) {
-
     if (config?.debug_with_time) {
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, '0');
@@ -136,6 +135,16 @@ const start = async (cli) => {
     } else {
       debug(`Not using Web GUI, to activate it add next options to your ./config/dark-messenger.json file:\n"use_web_gui": "true",\n"web_gui_address": "127.0.0.1",\n"web_gui_port": "9000",`);
     }
+
+    debug(`Generating Hidden Server source code ...`);
+    const hiddenServerScript = generateHiddenServerScript(config);
+    debug(`Hidden Server code generated:\n${hiddenServerScript}\n`);
+    debug(`Creating ./startHiddenServer.js file ...`);
+    await writeHiddenServerScript(hiddenServerScript);
+    debug(`Calling startHiddenServer() ...`);
+    startHiddenServer();
+    debug(`Call done`);
+
   } else {
     debug(`Config not found. This is can't never happen btw`);
   }
@@ -163,6 +172,7 @@ const stop = async (cli) => {
 
   console.log(`Stopping All Services...`);
   stopGuiServer();
+  stopHiddenServer();
   stopTor();
 };
 
@@ -188,7 +198,6 @@ const loadConfig = async (path) => {
 const generateGuiServerScript = (config) => {
   const script = `#!/usr/bin/env node
     import fs from "fs";
-    import chalk from "chalk";
     import express from "express";
 
     const app = express();
@@ -324,3 +333,104 @@ const stopGuiServer = () => {
   }
 };
 
+
+
+
+const generateHiddenServerScript = (config) => {
+  const script = `#!/usr/bin/env node
+    import fs from "fs";
+    import express from "express";
+
+    const app = express();
+    const port = ${config?.hidden_service_port || 9001};
+    const hostname = "${config?.hidden_service_hostname || "127.0.0.1"}";
+
+    app.get("/", (req, res) => {
+      res.send("This is a hidden service");
+    });
+
+    app.post('/', (req, res) => {
+      res.send("Processing your data...");
+    
+    });
+
+    const server = app.listen(port, hostname, () => {
+      console.log('GUI Server listening at http://\${hostname}:\${port}');
+      fs.writeFileSync('./hidden_server.pid', process.pid.toString());
+    });
+
+    process.on('SIGTERM', () => {
+      console.log('Received SIGTERM. Closing GUI Server...');
+      server.close(() => {
+        console.log('GUI Server closed.');
+        fs.unlinkSync('./hidden_server.pid');
+        console.log('hidden_server.pid has been deleted.');
+      });
+    });
+  `;
+
+  return script.trim();
+};
+
+const writeHiddenServerScript = async (scriptContent) => {
+  try {
+    await fs.promises.writeFile('./startHiddenServer.js', scriptContent);
+    verbose('startHiddenServer.js file has been created successfully.');
+  } catch (err) {
+    error(`Failed to write startHiddenServer.js: ${err}`);
+  }
+};
+
+const startHiddenServer = () => {
+  debug(`Running chmod 775 over ./startHiddenServer.js ... `);
+  fs.chmod("./startHiddenServer.js", 0o775, (err) => {
+    if (err) {
+      error(`CRITICAL: Error running chmod 775 over ./startHiddenServer.js: ${err}`);
+      exit();
+    }
+    debug(`./startHiddenServer.js is now executable`);
+  });
+
+  verbose(`Starting Hidden Server ...`);
+  const process = spawn("./startHiddenServer.js", [], {
+    detached: true,
+    stdio: "ignore"
+  });
+
+  debug(`Detaching Hidden Server process from node process ...`);
+  process.unref();
+
+  process.on('error', (err) => {
+    error(`Error Starting Hidden Server: ${err}`);
+  });
+
+  process.on("close", (code) => {
+    verbose(`Closing Hidden Server ...`);
+    debug(`Hidden Server process closing with code: ${code}`);
+  });
+};
+
+const stopHiddenServer = () => {
+  debug(`Extracting Hidden server process id from ./hidden_server.pid ... `);
+  if (fs.existsSync("./hidden_server.pid")) {
+    const pid = +fs.readFileSync("./hidden_server.pid").toString();
+    debug(`Extracted pid: ${pid}`);
+
+    try {
+      verbose(`Stopping Hidden Server`);
+      debug(`Sending SIGTERM signal to Hidden server process id ${pid}`);
+      process.kill(pid, 'SIGTERM');
+      console.log("Hidden Server successfully stopped.");
+      debug(`Deleting ./hidden_server.pid file ...`);
+      fs.unlinkSync("./hidden_server.pid");
+      debug(`./hidden_server.pid has been deleted`);
+      debug("Deleting ./startHiddenServer.js ...");
+      fs.unlinkSync("./startHiddenServer.js");
+      debug("./startHiddenServer.js has been deleted");
+    } catch (err) {
+      error(`Unable to terminate Hidden server process with PID ${pid}: ${err}`);
+    }
+  } else {
+    error(`./hidden_server.pid can't be found`);
+  }
+};
