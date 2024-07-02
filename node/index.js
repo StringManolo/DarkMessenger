@@ -192,11 +192,55 @@ const generateGuiServerScript = (config) => {
     import express from "express";
 
     const app = express();
-    const port = ${config.web_gui_port || 9000};
-    const hostname = "${config.web_gui_address || "127.0.0.1"}";
+    const port = ${config?.web_gui_port || 9000};
+    const hostname = "${config?.web_gui_address || "127.0.0.1"}";
 
     app.get('/', (req, res) => {
-      res.send('¡Hello World!');
+      res.send(\`<!DOCTYPE html>
+<html lang="en">
+<head prefix="og:http://ogp.me/ns#">
+  <meta charset="utf-8">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <title>Dark Messenger GUI</title>
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: black;
+      color: snow;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dark Messenger</h1>
+  <button onclick="sendMessage()">Send msg</button>
+  <script>
+    function showAlert(message) {
+      alert(message);
+    }
+
+    function sendMessage() {
+      const message = 'test123';
+
+      // hidden_service_hostname hidden_service_port
+      fetch('http://${config?.hidden_service_hostname || "127.0.0.1"}:${config?.hidden_service_port || 9001}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain'
+        },
+        body: message
+      })
+      .then(response => response.text())
+      .then(data => showAlert('Resp: ' + data))
+      .catch(error => showAlert('Error: ' + error.message));                                }
+  </script>
+</body>
+</html>
+    \`);
     });
 
     const server = app.listen(port, hostname, () => {
