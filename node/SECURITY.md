@@ -1,0 +1,4 @@
+- Avoid spoofing of usernames and messages
+- Fuzz all cli args
+- Fuzz all endpoints and args
+- Pentest

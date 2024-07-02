@@ -2,6 +2,8 @@
 - Move ./GUI/index.html to index.js to control hostname, port and other config
 - Create hidden service server
 - Create hidden service protocol
-- Make an interface to connect the browser to an express server thst handle the http requests itself (proxy)
+- Make an interface to connect the browser (WEB GUI) to an express server thst handle the http requests itself (proxy)
 - Implement the request back on add to request the other server to add you back
 - Implement the /send?message= endpoint using alias
+- Check that there is not same alias multiple times in address book (rename the following ocurrencies?)
+- Add a service to notify when a messsge has been recived (by /send hidden\_service\_server)

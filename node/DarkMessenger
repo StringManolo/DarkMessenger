@@ -4,7 +4,6 @@ import fs from "fs";
 import { spawn, exec } from "child_process";
 import parseCLI from "simpleargumentsparser";
 import chalk from "chalk";
-//import express from "express";
 
 // globals
 let v = false; // verbose
@@ -20,9 +19,9 @@ let config;     // config
 start     wakeup all services
 stop      shutdown all services
 
-add [alias] [domain]      Add an address to your Address Book
-addme [domain.onion]      Tell remote server to add you
-
+add [alias] [domain.onion]                Add an address to your Address Book
+addme [domain.onion]                      Tell remote server to add you
+send [alias] [message]                    Send a message 
 
 -c --config <filename>
 -v --verbose
@@ -40,8 +39,9 @@ addme [domain.onion]      Tell remote server to add you
       await add(cli);
     } else if (cli.o[0].includes("addme")) {
       await addme(cli);
+    } else if (cli.o[0].includes("send")) {
+      await send(cli);
     }
-    // Use add to manually add into address-book
   }
 })();
 
@@ -155,6 +155,35 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
 
     const result = await curl(`http://${cli.o[1][0]}`, `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`);
     debug(`Result: ${result}`);
+  } catch(err) {
+    error(`Error on Add() : ${err}`);
+  }
+}
+
+const send = async (cli) => {
+  v = true;
+  d = true;
+  const alias = cli.o?.[1]?.[0];
+  const message = cli.o?.[2]?.[0];
+  let address = "";
+  try {
+    const data = await fs.promises.readFile('./address_book/list.txt', 'utf8');
+    const addressBook = data.split('\n').map(line => line.trim()).filter(line => line !== '');
+    for (let i in addressBook) {
+      if (addressBook[i].split(" ")[0] == alias) {
+        debug(`Alias found, extracting address ... `);
+        address = addressBook[i].split(" ")[1];
+        break;
+      }
+    }
+
+    debug(`Loading config...`);
+    config = await loadConfig("./config/dark-messenger.json");
+
+    debug(`Sending message ... `);
+    const result = await curl(`http://${address}`, `send -d '{ "from":"${config.username}", "message":"${Buffer.from(message).toString('base64')}" }' -H 'Content-Type: application/json'`);
+    console.log(result); 
+
   } catch(err) {
     error(`Error on Add() : ${err}`);
   }
@@ -497,10 +526,31 @@ const generateHiddenServerScript = (config) => {
         await fs.promises.writeFile('./address_book/list.txt', updatedText);
         res.status(200).send("Remote server added you to it's address book");
       } catch (err) {
-        return res.status(500).send('Internal Error writting address book');
+        return res.status(500).send('Internal Server Error writting address book');
       }
 
     });
+
+
+    app.post('/send', async (req, res) => {
+      try {
+        const { from, message } = req.body;
+        const decodedMessage = Buffer.from(message, 'base64').toString('utf-8');
+        const msg = {}; 
+        msg.from = from;
+        msg.message = decodedMessage;
+
+        const existingMessages = JSON.parse(await fs.promises.readFile('./messages/list.json', 'utf8')); 
+
+        existingMessages.push(msg);
+
+        await fs.promises.writeFile('./messages/list.json', JSON.stringify(existingMessages, null, 2));
+        res.status(200).send('Message saved');
+      } catch(err) {
+        res.status(500).send('Internal Server Error read/write operation at ./messages/list.json');
+      }
+    });
+
 
     const server = app.listen(port, address, () => {
       console.log(\`Hidden Server listening at http://\${address}:\${port}\`);
