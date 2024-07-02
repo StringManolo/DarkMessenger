@@ -3,3 +3,5 @@
 - Create hidden service server
 - Create hidden service protocol
 - Make an interface to connect the browser to an express server thst handle the http requests itself (proxy)
+- Implement the request back on add to request the other server to add you back
+- Implement the /send?message= endpoint using alias

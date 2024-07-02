@@ -1,3 +1,8 @@
 node_modules/*
 tor_files/*
 hidden_service/*_secret_key
+logs/*
+startGuiServer.js
+startHiddenServer.js
+gui_server.pid
+hidden_server.pid
