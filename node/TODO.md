@@ -7,3 +7,4 @@
 - Implement the /send?message= endpoint using alias
 - Check that there is not same alias multiple times in address book (rename the following ocurrencies?)
 - Add a service to notify when a messsge has been recived (by /send hidden\_service\_server)
+- Add publickey sharing / encryption

@@ -1,6 +1,12 @@
 [
   {
     "from": "StringManolo",
-    "message": "Hello World"
+    "message": "Hello World",
+    "id": 0
+  },
+  {
+    "from": "StringManolo",
+    "message": "Hello Again",
+    "id": 1
   }
 ]

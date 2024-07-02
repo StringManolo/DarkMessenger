@@ -544,6 +544,11 @@ const generateHiddenServerScript = (config) => {
 
         existingMessages.push(msg);
 
+        // Add an id to handle the messages (read, delete, answer)
+        for (let i = 0; i < existingMessages.length; ++i) {
+          existingMessages[i].id = i;
+        }
+
         await fs.promises.writeFile('./messages/list.json', JSON.stringify(existingMessages, null, 2));
         res.status(200).send('Message saved');
       } catch(err) {
