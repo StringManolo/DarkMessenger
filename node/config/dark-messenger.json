@@ -8,6 +8,8 @@
   "hidden_service_port": 9001,
   "http_tor_proxy_url": "http://127.0.0.1:9002/",
   "tor_socks_url": "127.0.0.1:9050",
+  
+  "add_back": true,
 
   "verbose": true,
   "debug": true,
