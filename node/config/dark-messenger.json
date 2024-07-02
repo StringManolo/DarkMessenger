@@ -3,9 +3,10 @@
   "use_web_gui": true,
   "web_gui_address": "127.0.0.1",
   "web_gui_port": 9000,
-  "hidden_service_hostname": "127.0.0.1",
+  "hidden_service_address": "127.0.0.1",
+  "hidden_service_hostname": "auto",
   "hidden_service_port": 9001,
-
+  "http_tor_proxy_url": "http://127.0.0.1:9002/",
 
   "verbose": true,
   "debug": true,

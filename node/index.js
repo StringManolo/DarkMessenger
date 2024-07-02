@@ -15,7 +15,17 @@ let config;     // config
   const cli = await parseCLI();
 
   if (cli.noArgs || cli.s.h || cli.c.help)
-    exit(`usage:\n\nstart     wakeup all services\nstop      shutdown all services\n\n-c --config <filename>\n-v --verbose\n-d --debug\n`);
+    exit(`usage:
+
+start     wakeup all services
+stop      shutdown all services
+
+add       Add an address to your address book
+
+-c --config <filename>
+-v --verbose
+-d --debug
+`);
 
   if (cli.s.v || cli.c.verbose) v = true;
 
@@ -23,6 +33,10 @@ let config;     // config
     await start(cli);
   } else if (cli.c.stop || cli.o[0].includes("stop")) {
     await stop(cli);
+  } else {
+    if (cli.c.add || cli.o[0].includes("add")) {
+      console.log("Client not yet");
+    }
   }
 })();
 
@@ -56,6 +70,10 @@ const debug = msg => {
 const error = msg => {
   console.log(`${chalk.red("[ERROR]")} ${msg}`);
 };
+
+const sleep = ms => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const startTor = () => {
   debug(`Creating file to store tor pid process ... `);
@@ -121,7 +139,29 @@ const start = async (cli) => {
   verbose("Verbose Activated");
   debug("Debug Activated");
 
+  startTor();
+
   if (config) {
+    debug(`Replacing auto by hostnane ...`);
+    if (config?.hidden_service_hostname === "auto") {
+      let secondsCounter = 0;
+      debug(`Waiting for ./hidden_service/hostname file to be created by tor`);
+      while (!fs.existsSync("./hidden_service/hostname")) {
+        await sleep(1000);
+        debug(`Waited ${++secondsCounter} second/s for file to be created by Tor`);
+        if (secondsCounter > 5) {
+          debug(`Waiting for to long. Breaking from loop`);
+        }
+      }
+
+      try {
+        config.hidden_service_hostname = (await loadFile("./hidden_service/hostname")).trim();
+        debug(`Got hostname: ${config.hidden_service_hostname}`);
+      } catch(err) {
+        error(`Unable to load ./hidden_service/hostanme, maybe try again: ${error}`);
+      }
+    }
+
     debug(`Checking if use_web_gui is true`);
     if (config?.use_web_gui) {
       debug(`Generating GUI Server source code ...`);
@@ -149,7 +189,6 @@ const start = async (cli) => {
     debug(`Config not found. This is can't never happen btw`);
   }
 
-  startTor();
 };
 
 const stop = async (cli) => {
@@ -235,8 +274,7 @@ const generateGuiServerScript = (config) => {
     function sendMessage() {
       const message = 'test123';
 
-      // hidden_service_hostname hidden_service_port
-      fetch('http://${config?.hidden_service_hostname || "127.0.0.1"}:${config?.hidden_service_port || 9001}', {
+      fetch('${config?.http_tor_proxy_url || "http://127.0.0.1:9002/"}http://${config?.hidden_service_hostname || "127.0.0.1"}:${config?.hidden_service_port || 9001}', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain'
@@ -343,19 +381,44 @@ const generateHiddenServerScript = (config) => {
 
     const app = express();
     const port = ${config?.hidden_service_port || 9001};
-    const hostname = "${config?.hidden_service_hostname || "127.0.0.1"}";
+    const address = "${config?.hidden_service_address || "127.0.0.1"}";
+
+    app.use(express.json());
 
     app.get("/", (req, res) => {
-      res.send("This is a hidden service");
+      res.send("DarkMessenger API");
     });
 
-    app.post('/', (req, res) => {
-      res.send("Processing your data...");
-    
+    /* Req Example:
+     * curl --socks5-hostname 127.0.0.1:9050 http://4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion:9001/add -d '{ "alias": "sm", "address": "sm.onion" }' -H "Content-Type: application/json"
+    */
+    app.post('/add', async (req, res) => {
+      const { alias, address } = req.body;
+      let addressBook = [];
+      try {
+        const data = await fs.promises.readFile('./address_book/list.txt', 'utf8');
+        addressBook = data.split('\\n').map(line => line.trim()).filter(line => line !== '');
+      } catch (err) {
+        console.error('Error reading file:', err);
+        return res.status(500).send('Internal Error reading address book');
+      }
+
+      addressBook.push(\`\${alias} \${address}\`);
+      const uniqueEntries = new Set(addressBook);
+       
+      const updatedText = Array.from(uniqueEntries).join('\\n');
+
+      try {
+        await fs.promises.writeFile('./address_book/list.txt', updatedText);
+        res.status(200).send("Remote server added you to it's address book");
+      } catch (err) {
+        return res.status(500).send('Internal Error writting address book');
+      }
+
     });
 
-    const server = app.listen(port, hostname, () => {
-      console.log('GUI Server listening at http://\${hostname}:\${port}');
+    const server = app.listen(port, address, () => {
+      console.log(\`Hidden Server listening at http://\${address}:\${port}\`);
       fs.writeFileSync('./hidden_server.pid', process.pid.toString());
     });
 

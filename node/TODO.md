@@ -2,3 +2,4 @@
 - Move ./GUI/index.html to index.js to control hostname, port and other config
 - Create hidden service server
 - Create hidden service protocol
+- Make an interface to connect the browser to an express server thst handle the http requests itself (proxy)
