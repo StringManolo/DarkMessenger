@@ -20,7 +20,8 @@ let config;     // config
 start     wakeup all services
 stop      shutdown all services
 
-add [domain.onion]      Add an address to your address book
+add [alias] [domain]      Add an address to your Address Book
+addme [domain.onion]      Tell remote server to add you
 
 
 -c --config <filename>
@@ -35,9 +36,12 @@ add [domain.onion]      Add an address to your address book
   } else if (cli.c.stop || cli.o[0].includes("stop")) {
     await stop(cli);
   } else {
-    if (cli.c.add || cli.o[0].includes("add")) {
-      add(cli);
+    if (cli.o[0].includes("add")) {
+      await add(cli);
+    } else if (cli.o[0].includes("addme")) {
+      await addme(cli);
     }
+    // Use add to manually add into address-book
   }
 })();
 
@@ -97,8 +101,45 @@ const curl = async (url, args) => {
   });
 };
 
+const add = async (cli) => {
+  v = true;
+  d = true;
+  debug(`Getting alias and address from cli args ...`);
+  const alias = cli.o?.[1]?.[0];
+  const address = cli.o?.[2]?.[0];
+  debug(`Alias: (${alias}), Address (${address})`);
 
-const add = async (cli) => { //TODO: Add Verbose and Debug outputs
+
+  let addressBook = [];
+  try {
+    debug(`Reading ./address_book/list.txt ... `);
+    const data = await fs.promises.readFile('./address_book/list.txt', 'utf8');
+    debug(`Splitting entries by line ... `);
+    addressBook = data.split('\n').map(line => line.trim()).filter(line => line !== '');
+    debug(`A total of ${addressBook.length} contacts found in your addresses list`);
+  } catch (err) {
+    error('Error reading file:', err);
+    process.exit(0);
+  }
+
+  debug(`Adding new entry to in-memory address book ... `);
+  addressBook.push(`${alias} ${address}`);
+  debug(`Removing all duplicates (if there is any) ... `);
+  const uniqueEntries = new Set(addressBook);
+  debug(`Casting addressBook array to a string (ready to dump in file)... `);
+  const updatedText = Array.from(uniqueEntries).join('\n');
+
+  try {
+    debug(`Rewrite address_book/list.txt with the new ssv alias address pair`);
+    await fs.promises.writeFile('./address_book/list.txt', updatedText);
+    console.log("Added to your address book");
+  } catch (err) {
+    error(`Error writting on the address book: ${err}`);
+  } 
+  debug(`Done`);
+}
+
+const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
   v = true;
   d = true;
   try {
@@ -108,11 +149,11 @@ const add = async (cli) => { //TODO: Add Verbose and Debug outputs
     const hostname = config.hidden_service_hostname = (await loadFile("./hidden_service/hostname")).trim();
     debug(`Extracting onion domain from cli`);
     if (! cli.o?.[1]?.[0] ) {
-      error(`Use "./DarkMessenger add domain.onion" to provide the address of the user you want to add`);
+      error(`Use "./DarkMessenger addme domain.onion" to provide the address of the user you want to add you`);
       process.exit(0);
     }
 
-    const result = await curl(`http://${cli.o[1][0]}`, `add -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`);
+    const result = await curl(`http://${cli.o[1][0]}`, `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`);
     debug(`Result: ${result}`);
   } catch(err) {
     error(`Error on Add() : ${err}`);
@@ -434,9 +475,9 @@ const generateHiddenServerScript = (config) => {
     });
 
     /* Req Example:
-     * curl --socks5-hostname 127.0.0.1:9050 http://4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion:9001/add -d '{ "alias": "sm", "address": "sm.onion" }' -H "Content-Type: application/json"
+     * curl --socks5-hostname 127.0.0.1:9050 http://4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion:9001/addme -d '{ "alias": "sm", "address": "sm.onion" }' -H "Content-Type: application/json"
     */
-    app.post('/add', async (req, res) => {
+    app.post('/addme', async (req, res) => {
       const { alias, address } = req.body;
       let addressBook = [];
       try {
