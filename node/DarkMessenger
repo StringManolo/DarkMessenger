@@ -243,32 +243,37 @@ const show = async (cli) => {
 
   const alias = cli.o?.[1]?.[0];
   debug(`Alias on show function is ${alias}`);
-  
-  const messagesRAW = await fs.promises.readFile('./messages/list.json', 'utf8'); 
-  const messages = JSON.parse(messagesRAW);
 
-  let textMessages = "";
-  let found = false;
+  try {
+    const messagesRAW = await fs.promises.readFile('./messages/list.json', 'utf8'); 
+    const messages = JSON.parse(messagesRAW);
 
-  if (!alias) {
-    for (let i in messages) {
-      found = true;
-      textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n`
-      textMessages += `${messages[i].message}\n\n`;
-    }
-  } else {
-    for (let i in messages) {
-      if (messages[i].from === alias) {
-         found = true;
-         textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n${messages[i].message}\n\n`; 
+    let textMessages = "";
+    let found = false;
+
+    if (!alias) {
+      for (let i in messages) {
+        found = true;
+        textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n`
+        textMessages += `${messages[i].message}\n\n`;
+      }
+    } else {
+      for (let i in messages) {
+        if (messages[i].from === alias) {
+           found = true;
+           textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n${messages[i].message}\n\n`; 
+        }
       }
     }
-  }
-  
-  if (!found) {
-    console.log(`No messages to show`);
-  } else {
-    console.log(textMessages);
+    
+    if (!found) {
+      console.log(`No messages to show`);
+    } else {
+      console.log(textMessages);
+    }
+  } catch(err) {
+    error(`Unable to read/parse/access ./messages/list.json: ${err}`);
+    process.exit(0);
   }
 }
 
@@ -276,10 +281,28 @@ const del = async (cli) => {
   v = true;
   d = true;
 
+
   const id = cli.o?.[1]?.[0];
+  debug(`Got ID ${id} from cli`);
   if (!id) {
     error(`You need to provide the id of the message you want to remove`);
+    process.exit(0);
   }
+
+  try {
+    const messagesRAW = await fs.promises.readFile('./messages/list.json', 'utf8');
+    let messages = JSON.parse(messagesRAW);
+
+    debug(`Messages  prefilter: ${messages}`);
+    messages = messages.filter(message => +message.id !== +id);
+    debug(`Messages postfilter: ${messages}`);
+
+    await fs.promises.writeFile('./messages/list.json', JSON.stringify(messages, null, 2));
+  } catch(err) {
+    error(`Unable to delete message: ${err}`);
+  }
+
+  console.log('Done');
 }
 
 

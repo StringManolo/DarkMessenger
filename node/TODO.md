@@ -14,3 +14,5 @@
 - Create documentation
 - Comment the code
 - Lint the code
+- Add more verbose and debug
+- Add more args for the config files
