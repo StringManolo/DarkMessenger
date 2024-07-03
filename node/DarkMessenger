@@ -43,7 +43,7 @@ ${chalk.bold.yellow('-d --debug')}
     } else if (cli.o[0].includes("addme")) {
       await addme(cli);
     } else if (cli.o[0].includes("contacts")) {
-      await contacts();
+      await contacts(cli);
     } else if (cli.o[0].includes("send")) {
       await send(cli);
     } else if (cli.o[0].includes("show")) {
@@ -202,7 +202,38 @@ const send = async (cli) => {
 
 
 const contacts = async (cli) => {
+  v = true;
+  d = true;
 
+  const alias = cli.o?.[1]?.[0];
+  let foundContacts = false;
+  let result = false;
+
+  try {
+    const contacts = await fs.promises.readFile("./address_book/list.txt", "utf-8") || null;
+    if (!contacts) exit("Contact list is empty");
+    if (!alias) {
+      result = contacts;
+    } else {
+      
+      const contactLine = contacts.split("\n");
+      for (let i in contactLine) {
+        if (contactLine[i].split(" ")[0] === alias) {
+          result = contactLine[i]
+          break;
+        }
+      }
+    }
+  } catch(err) {
+    error(`Unable to read contacts from ./address_book/list.txt`);
+    process.exit(0);
+  }
+
+  if (result) {
+    console.log(result);
+  } else {
+    console.log("Unable to find");
+  }
 }
 
 
