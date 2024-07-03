@@ -14,22 +14,21 @@ let config;     // config
   const cli = await parseCLI();
 
   if (cli.noArgs || cli.s.h || cli.c.help)
-    exit(`usage:
+    exit(`Usage:
 
-start     wakeup all services
-stop      shutdown all services
+${chalk.bold.yellow('start')}          ${chalk.white('Wake up all services')}
+${chalk.bold.yellow('stop')}           ${chalk.white('Shutdown all services')}
 
-add [alias] [domain.onion]                Add an address to your Address Book
-addme [domain.onion]                      Tell remote server to add you
-contacts [alias or none]                   Show a contact address or all contacts
-send [alias] [message]                    Send a message 
-show [alias or none]                      Show messages from someone 
-delete [id]                               Delete messages from someone 
+${chalk.bold.yellow('add')} ${chalk.italic('[alias] [domain.onion]')}           ${chalk.white('Add an address to your Address Book')}
+${chalk.bold.yellow('addme')} ${chalk.italic('[domain.onion]')}                 ${chalk.white('Tell remote server to add you')}
+${chalk.bold.yellow('contact')} ${chalk.italic('<alias>')}                      ${chalk.white('Show a contact address or all contacts')}
+${chalk.bold.yellow('send')} ${chalk.italic('[alias] [message]')}               ${chalk.white('Send a message')}
+${chalk.bold.yellow('show')} ${chalk.italic('<alias>')}                         ${chalk.white('Show messages from someone')}
+${chalk.bold.yellow('delete')} ${chalk.italic('[id]')}                          ${chalk.white('Delete messages from someone')}
 
-
--c --config <filename>
--v --verbose
--d --debug
+${chalk.bold.yellow('-c --config')} ${chalk.italic('<filename>')}
+${chalk.bold.yellow('-v --verbose')}
+${chalk.bold.yellow('-d --debug')}
 `);
 
   if (cli.s.v || cli.c.verbose) v = true;
