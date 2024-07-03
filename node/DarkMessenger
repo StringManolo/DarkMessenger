@@ -63,7 +63,7 @@ const exit = msg => {
 
 const verbose = msg => {
   if (v || config?.verbose) {
-    console.log(`${chalk.green("[VERBOSE]")} ${msg}`);
+    console.log(`${chalk.bold.green("[VERBOSE]")} ${msg}`);
   }
 };
 
@@ -76,15 +76,15 @@ const debug = msg => {
       const seconds = now.getSeconds().toString().padStart(2, '0');
       const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
       const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
-      console.log(`${chalk.blue("[DEBUG-" + timestamp + "]")} ${msg}`);
+      console.log(`${chalk.bold.blue("[DEBUG-" + timestamp + "]")} ${msg}`);
     } else {
-      console.log(`${chalk.blue("[DEBUG]")} ${msg}`);
+      console.log(`${chalk.bold.blue("[DEBUG]")} ${msg}`);
     }
   }
 };
 
 const error = msg => {
-  console.log(`${chalk.red("[ERROR]")} ${msg}`);
+  console.log(`${chalk.bold.red("[ERROR]")} ${msg}`);
 };
 
 const sleep = ms => {
@@ -222,14 +222,14 @@ const show = async (cli) => {
   if (!alias) {
     for (let i in messages) {
       found = true;
-      textMessages += `Message with id ${chalk.yellow(messages[i].id)} from ${chalk.yellow(messages[i].from)}\n`
+      textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n`
       textMessages += `${messages[i].message}\n\n`;
     }
   } else {
     for (let i in messages) {
       if (messages[i].from === alias) {
          found = true;
-         textMessages += `Message with id ${chalk.yellow(messages[i].id)} from ${chalk.yellow(messages[i].from)}\n${messages[i].message}\n\n`; 
+         textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n${messages[i].message}\n\n`; 
       }
     }
   }
