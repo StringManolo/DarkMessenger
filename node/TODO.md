@@ -9,3 +9,8 @@
 - Add a service to notify when a messsge has been recived (by /send hidden\_service\_server)
 - Add publickey sharing / encryption
 - Manage v and d vars in functions based on config / args (maybe make a pure check funcion to set them by loading config file + args). 
+- Update the readme
+- Standalone cli command install.sh
+- Create documentation
+- Comment the code
+- Lint the code
