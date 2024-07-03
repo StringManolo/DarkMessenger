@@ -2,3 +2,7 @@
 - Fuzz all cli args
 - Fuzz all endpoints and args
 - Pentest
+- Add an option to block an user messages
+- Add an message spam detection
+- Add a rate limit for requests per second, also per min (in config)
+- Try to ddos the app with non closing tunnels

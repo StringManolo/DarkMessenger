@@ -21,7 +21,11 @@ stop      shutdown all services
 
 add [alias] [domain.onion]                Add an address to your Address Book
 addme [domain.onion]                      Tell remote server to add you
+contacts [alias or none]                   Show a contact address or all contacts
 send [alias] [message]                    Send a message 
+show [alias or none]                      Show messages from someone 
+delete [id]                               Delete messages from someone 
+
 
 -c --config <filename>
 -v --verbose
@@ -39,8 +43,16 @@ send [alias] [message]                    Send a message
       await add(cli);
     } else if (cli.o[0].includes("addme")) {
       await addme(cli);
+    } else if (cli.o[0].includes("contacts")) {
+      await contacts();
     } else if (cli.o[0].includes("send")) {
       await send(cli);
+    } else if (cli.o[0].includes("show")) {
+      await show(cli);
+    } else if (cli.o[0].includes("delete")) {
+      await del(cli);
+    } else {
+      // TODO: not known commands
     }
   }
 })();
@@ -188,6 +200,58 @@ const send = async (cli) => {
     error(`Error on Add() : ${err}`);
   }
 }
+
+
+const contacts = async (cli) => {
+
+}
+
+
+const show = async (cli) => {
+  v = true;
+  d = true;
+
+  const alias = cli.o?.[1]?.[0];
+  debug(`Alias on show function is ${alias}`);
+  
+  const messagesRAW = await fs.promises.readFile('./messages/list.json', 'utf8'); 
+  const messages = JSON.parse(messagesRAW);
+
+  let textMessages = "";
+  let found = false;
+
+  if (!alias) {
+    for (let i in messages) {
+      found = true;
+      textMessages += `Message with id ${chalk.yellow(messages[i].id)} from ${chalk.yellow(messages[i].from)}\n`
+      textMessages += `${messages[i].message}\n\n`;
+    }
+  } else {
+    for (let i in messages) {
+      if (messages[i].from === alias) {
+         found = true;
+         textMessages += `Message with id ${chalk.yellow(messages[i].id)} from ${chalk.yellow(messages[i].from)}\n${messages[i].message}\n\n`; 
+      }
+    }
+  }
+  
+  if (!found) {
+    console.log(`No messages to show`);
+  } else {
+    console.log(textMessages);
+  }
+}
+
+const del = async (cli) => {
+  v = true;
+  d = true;
+
+  const id = cli.o?.[1]?.[0];
+  if (!id) {
+    error(`You need to provide the id of the message you want to remove`);
+  }
+}
+
 
 const startTor = () => {
   debug(`Creating file to store tor pid process ... `);
