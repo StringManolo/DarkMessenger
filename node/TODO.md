@@ -16,3 +16,4 @@
 - Lint the code
 - Add more verbose and debug
 - Add more args for the config files
+- Add on show cli function the auto mark messages as read
