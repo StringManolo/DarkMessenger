@@ -1,5 +1,4 @@
 - Make sure multiple start commands in a row don't make unintended errors
-- Move ./GUI/index.html to index.js to control hostname, port and other config
 - Make an interface to connect the browser (WEB GUI) to an express server thst handle the http requests itself (proxy)
 - Implement the request back on add to request the other server to add you back
 - Check that there is not same alias multiple times in address book (rename the following ocurrencies?)
