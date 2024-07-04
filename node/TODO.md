@@ -18,7 +18,10 @@
 - Check read messages (possible bug reusing ids of already read messages so new messanges are not notified. Probably fixable just by removing the id from read_messages.json when removing messages using the delete messages from cli function)
 - Ask user for username the first time running the program and add it to the config/dark_messenger.json
 - Make sure start files are not included (.gitignore)
-
+- Add a cli command to show your address .onion
+- Fix curl port usage to use config port number (--socks5)
+- Add checks if cli args (for example add alias address) make sure they are valid with regexp
+- Show help when not known command
 
 #### End Goals
 - APK
