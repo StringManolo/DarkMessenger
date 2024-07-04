@@ -323,6 +323,11 @@ const startTor = () => {
   });
 
   debug(`Storing tor pid at ./tor_files/tor.pid ...`);
+  if (!fs.existsSync("./tor_files")) {
+    debug(`Making dir ./tor_files/ ... `);
+    fs.mkdirSync("./tor_files", { recursive: true });
+  }
+
   fs.writeFileSync("./tor_files/tor.pid", process.pid.toString());
 
   debug(`Detaching tor process from node process ...`);
