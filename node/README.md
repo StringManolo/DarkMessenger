@@ -8,11 +8,12 @@ You need to install next software in your system:
 - git
 - node
 - npm
+- curl
 
 For example in Alpine linux:
 ```bash
 apk update
-apk add tor git nodejs npm
+apk add tor git nodejs npm curl
 ```
 
 ### Install
