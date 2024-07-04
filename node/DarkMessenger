@@ -21,7 +21,7 @@ ${chalk.bold.yellow('stop')}           ${chalk.white('Shutdown all services')}
 
 ${chalk.bold.yellow('add')} ${chalk.italic('[alias] [domain.onion]')}           ${chalk.white('Add an address to your Address Book')}
 ${chalk.bold.yellow('addme')} ${chalk.italic('[domain.onion]')}                 ${chalk.white('Tell remote server to add you')}
-${chalk.bold.yellow('contact')} ${chalk.italic('<alias>')}                      ${chalk.white('Show a contact address or all contacts')}
+${chalk.bold.yellow('contacts')} ${chalk.italic('<alias>')}                      ${chalk.white('Show a contact address or all contacts')}
 ${chalk.bold.yellow('send')} ${chalk.italic('[alias] [message]')}               ${chalk.white('Send a message')}
 ${chalk.bold.yellow('show')} ${chalk.italic('<alias>')}                         ${chalk.white('Show messages from someone')}
 ${chalk.bold.yellow('delete')} ${chalk.italic('[id]')}                          ${chalk.white('Delete messages from someone')}
@@ -398,8 +398,9 @@ const start = async (cli) => {
       while (!fs.existsSync("./hidden_service/hostname")) {
         await sleep(1000);
         debug(`Waited ${++secondsCounter} second/s for file to be created by Tor`);
-        if (secondsCounter > 5) {
+        if (secondsCounter > 10) {
           debug(`Waiting for to long. Breaking from loop`);
+          break;
         }
       }
 

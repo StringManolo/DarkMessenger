@@ -1,6 +1,6 @@
 node_modules/*
 tor_files/*
-hidden_service/*_secret_key
+hidden_service/*
 logs/*
 startGuiServer.js
 startHiddenServer.js
