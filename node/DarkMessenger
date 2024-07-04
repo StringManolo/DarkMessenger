@@ -5,8 +5,6 @@ import { spawn, exec } from "child_process";
 import parseCLI from "simpleargumentsparser";
 import chalk from "chalk";
 
-import readline from "readline"; // Unread messages service
-
 // globals
 let v = false; // verbose
 let d = false; // debug
@@ -253,25 +251,33 @@ const show = async (cli) => {
     let textMessages = "";
     let found = false;
 
+    // Mark As Read
+    let foundIds = JSON.parse(await fs.promises.readFile("./messages/read_messages.json", "utf-8"));
+
     if (!alias) {
       for (let i in messages) {
         found = true;
         textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n`
         textMessages += `${messages[i].message}\n\n`;
+        foundIds.push(messages[i].id);
       }
     } else {
       for (let i in messages) {
         if (messages[i].from === alias) {
-           found = true;
-           textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n${messages[i].message}\n\n`; 
+          found = true;
+          textMessages += `Message with id ${chalk.bold.yellow(messages[i].id)} from ${chalk.bold.yellow(messages[i].from)}\n${messages[i].message}\n\n`; 
+          foundIds.push(messages[i].id);
         }
       }
     }
-    
+  
+
     if (!found) {
       console.log(`No messages to show`);
     } else {
       console.log(textMessages);
+      foundIds = [... new Set(foundIds)]; //remove duplicated ids
+      await fs.promises.writeFile("./messages/read_messages.json", JSON.stringify(foundIds, null, 2))
     }
   } catch(err) {
     error(`Unable to read/parse/access ./messages/list.json: ${err}`);
@@ -786,7 +792,9 @@ const generateMessageAlertServiceScript = (config) => {
     
       const unreadMessages = existingMessages.filter(message => !readMessages.includes(message.id));
 
-      console.log('\\n\\n' + chalk.bold.blue('[DARKMESSENGER NOTIFICATION]') + ' Found ' + chalk.bold.yellow(unreadMessages.length) + ' new messages. \\n\\nRun ' + chalk.bold.yellow('./DarkMessenger show') + ' to mark them as read. \\n\\nIf you want to disable notifications for new messages set ' + chalk.italic.white('"alert_on_new_messages": false,') + ' at ./config/dark-messenger.json\\n\\n' );
+      if (unreadMessages.length > 0) {
+        console.log('\\n\\n' + chalk.bold.blue('[DARKMESSENGER NOTIFICATION]') + ' Found ' + chalk.bold.yellow(unreadMessages.length) + ' new messages. \\n\\nRun ' + chalk.bold.yellow('./DarkMessenger show') + ' to mark them as read. \\n\\nIf you want to disable notifications for new messages set ' + chalk.italic.white('"alert_on_new_messages": false,') + ' at ./config/dark-messenger.json\\n\\n' );
+      }
     };
 
     setInterval(checkNewMessages, ${config?.check_new_messages_seconds * 1000 || 15000} );

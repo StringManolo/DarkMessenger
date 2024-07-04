@@ -12,6 +12,5 @@
 - Lint the code
 - Add more verbose and debug
 - Add more args for the config files
-- IMPORTANT: Add on show cli function the auto mark messages as read
 - Add to config an option to run ./DarMessenger start when system boots
 - Add options cli to change directly the dark_messenger.config file from the cli
