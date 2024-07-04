@@ -378,7 +378,12 @@ const start = async (cli) => {
   verbose("Verbose Activated");
   debug("Debug Activated");
 
-  startTor();
+  if (fs.existsSync("./tor_files/tor.pid")) {
+    const torPid = await fs.promises.readFile("./tor_files/tor.pid");
+    verbose(`Tor already running with pid ${torPid}`);
+  } else {
+    startTor();
+  }
 
   if (config) {
     debug(`Replacing auto by hostnane ...`);
@@ -403,50 +408,70 @@ const start = async (cli) => {
 
     debug(`Checking if alert_on_new_messages is true`);
     if (config?.alert_on_new_messages) {
-      debug(`Generating MessageAlert server source code`);
-      const newMessageAlertServerScript = generateMessageAlertServiceScript(config);
-      debug(`MessageAlert Service code generated:\n${newMessageAlertServerScript}\n`);
-      debug(`Creating ./startMessageAlertServer.js file`);
-      await writeMessageAlertServerScript(newMessageAlertServerScript);
-      debug(`Calling startMessageAlertServer() ...`);
-      startMessageAlertServer();
-      debug(`Call done`);
+      if (fs.existsSync("./message_alert_server.pid")) {
+        const masPid = await fs.promises.readFile("./message_alert_server.pid");
+        verbose(`Message Alert Server already running with pid ${masPid}`);
+      } else {
+        debug(`Generating MessageAlert server source code`);
+        const newMessageAlertServerScript = generateMessageAlertServiceScript(config);
+        debug(`MessageAlert Service code generated:\n${newMessageAlertServerScript}\n`);
+        debug(`Creating ./startMessageAlertServer.js file`);
+        await writeMessageAlertServerScript(newMessageAlertServerScript);
+        debug(`Calling startMessageAlertServer() ...`);
+        startMessageAlertServer();
+        debug(`Call done`);
+      }
     } else {
       debug(`Not using MessageNotifier, to activate it add next options to your ./config/dark-messenger.json file:\n"alert_on_new_messages": "true",\n"check_new_messages_seconds": "15",`); 
     }
 
     debug(`Checking if use_web_gui is true`);
     if (config?.use_web_gui) {
-      debug(`Generating GUI Server source code ...`);
-      const guiServerScript = generateGuiServerScript(config);
-      debug(`GUI Server code generated:\n${guiServerScript}\n`);
-      debug(`Creating ./startGuiServer.js file ...`);
-      await writeGuiServerScript(guiServerScript);
-      debug(`Calling startGuiServer() ...`);
-      startGuiServer();
-      debug(`Call done`);
+      if (fs.existsSync("./gui_server.pid")) {
+        const guiPid = await fs.promises.readFile("./gui_server.pid");
+        verbose(`GUI Server already running with pid ${guiPid}`);
+      } else {
+        debug(`Generating GUI Server source code ...`);
+        const guiServerScript = generateGuiServerScript(config);
+        debug(`GUI Server code generated:\n${guiServerScript}\n`);
+        debug(`Creating ./startGuiServer.js file ...`);
+        await writeGuiServerScript(guiServerScript);
+        debug(`Calling startGuiServer() ...`);
+        startGuiServer();
+        debug(`Call done`);
 
-      debug(`Also using the Tor Proxy Server by default to allow any browser to reach .onion addresses without browser configuration ...`);
-      debug(`Generating Proxy Server source code ...`);
-      const proxyServerScript = generateProxyServerScript(config);
-      debug(`Proxy Server code generated:\n${proxyServerScript}\n`);
-      debug(`Creating ./startProxyServer.js file ...`);
-      await writeProxyServerScript(proxyServerScript);
-      debug(`Calling startProxyServer() ...`);
-      startProxyServer();
-      debug(`Call done`);
+        debug(`Also using the Tor Proxy Server by default to allow any browser to reach .onion addresses without browser configuration ...`);
+        if (fs.existsSync("./proxy_server.pid")) {
+          const proxyPid = await fs.promises.readFile("./proxy_server.pid");
+          verbose(`Proxy Server already running with pid ${proxyPid}`);
+        } else {
+          debug(`generating proxy server source code ...`);
+          const proxyServerScript = generateProxyServerScript(config);
+          debug(`Proxy Server code generated:\n${proxyServerScript}\n`);
+          debug(`Creating ./startProxyServer.js file ...`);
+          await writeProxyServerScript(proxyServerScript);
+          debug(`Calling startProxyServer() ...`);
+          startProxyServer();
+          debug(`Call done`);
+        }
+      }
     } else {
       debug(`Not using Web GUI, to activate it add next options to your ./config/dark-messenger.json file:\n"use_web_gui": "true",\n"web_gui_address": "127.0.0.1",\n"web_gui_port": "9000",`);
     }
 
-    debug(`Generating Hidden Server source code ...`);
-    const hiddenServerScript = generateHiddenServerScript(config);
-    debug(`Hidden Server code generated:\n${hiddenServerScript}\n`);
-    debug(`Creating ./startHiddenServer.js file ...`);
-    await writeHiddenServerScript(hiddenServerScript);
-    debug(`Calling startHiddenServer() ...`);
-    startHiddenServer();
-    debug(`Call done`);
+    if (fs.existsSync("./hidden_server.pid")) {
+      const hiddenPid = await fs.promises.readFile("./hidden_server.pid");
+      verbose(`Hidden Server already running with pid ${hiddenPid}`);
+    } else {
+      debug(`Generating Hidden Server source code ...`);
+      const hiddenServerScript = generateHiddenServerScript(config);
+      debug(`Hidden Server code generated:\n${hiddenServerScript}\n`);
+      debug(`Creating ./startHiddenServer.js file ...`);
+      await writeHiddenServerScript(hiddenServerScript);
+      debug(`Calling startHiddenServer() ...`);
+      startHiddenServer();
+      debug(`Call done`);
+    }
 
   } else {
     debug(`Config not found. This is can't never happen btw`);

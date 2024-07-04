@@ -1,4 +1,4 @@
-- Make sure multiple start commands in a row don't make unintended errors
+- (Maybe a cleab is needed if processes are not running but .pid files exist cuz user forced a close without using ./DarkMessenger stop)
 - Implement the request back on add to request the other server to add you back
 - Check that there is not same alias multiple times in address book (rename the following ocurrencies?)
 - Add publickey sharing / encryption
