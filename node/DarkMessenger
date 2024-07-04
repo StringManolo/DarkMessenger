@@ -387,6 +387,10 @@ const start = async (cli) => {
     const torPid = await fs.promises.readFile("./tor_files/tor.pid");
     verbose(`Tor already running with pid ${torPid}`);
   } else {
+    if (!fs.existsSync("./hidden_service")) {
+      debug(`./hidden_service folder dosn't exist yet. Making it ...`);
+      fs.mkdirSync("./hidden_service", { recursive: true });
+    }
     startTor();
   }
 

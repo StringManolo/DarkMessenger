@@ -1,5 +1,3 @@
 test test.onion
 test2 test2.onion
 sm sm.onion
-StringManolo 4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion
-soscw 4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion

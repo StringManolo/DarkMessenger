@@ -4,5 +4,10 @@ hidden_service/*
 logs/*
 startGuiServer.js
 startHiddenServer.js
+startMessageAlertServer.js
+startProxyServer.js
 gui_server.pid
 hidden_server.pid
+message_alert_server.pid
+proxy_server.pid
+tor_files/tor.pid
