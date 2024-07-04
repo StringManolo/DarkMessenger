@@ -10,8 +10,9 @@
   "tor_socks_url": "127.0.0.1:9050",
 
   "add_back": true,
+
   "alert_on_new_messages": true,
-  "check_new_messages_seconds": 10,
+  "check_new_messages_seconds": 20,
 
   "verbose": true,
   "debug": true,

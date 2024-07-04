@@ -5,6 +5,8 @@ import { spawn, exec } from "child_process";
 import parseCLI from "simpleargumentsparser";
 import chalk from "chalk";
 
+import readline from "readline"; // Unread messages service
+
 // globals
 let v = false; // verbose
 let d = false; // debug
@@ -393,6 +395,20 @@ const start = async (cli) => {
       }
     }
 
+    debug(`Checking if alert_on_new_messages is true`);
+    if (config?.alert_on_new_messages) {
+      debug(`Generating MessageAlert server source code`);
+      const newMessageAlertServerScript = generateMessageAlertServiceScript(config);
+      debug(`MessageAlert Service code generated:\n${newMessageAlertServerScript}\n`);
+      debug(`Creating ./startMessageAlertServer.js file`);
+      await writeMessageAlertServerScript(newMessageAlertServerScript);
+      debug(`Calling startMessageAlertServer() ...`);
+      startMessageAlertServer();
+      debug(`Call done`);
+    } else {
+      debug(`Not using MessageNotifier, to activate it add next options to your ./config/dark-messenger.json file:\n"alert_on_new_messages": "true",\n"check_new_messages_seconds": "15",`); 
+    }
+
     debug(`Checking if use_web_gui is true`);
     if (config?.use_web_gui) {
       debug(`Generating GUI Server source code ...`);
@@ -441,6 +457,7 @@ const stop = async (cli) => {
   debug("Debug Activated");
 
   console.log(`Stopping All Services...`);
+  stopMessageAlertServer();
   stopGuiServer();
   stopHiddenServer();
   stopTor();
@@ -754,3 +771,94 @@ const stopHiddenServer = () => {
     error(`./hidden_server.pid can't be found`);
   }
 };
+
+
+const generateMessageAlertServiceScript = (config) => {
+   const script = `#!/usr/bin/env node
+    import fs from "fs";
+    import chalk from "chalk";
+
+    // TODO: Add try catch blocks
+   
+    const checkNewMessages = async () => {
+      const existingMessages = JSON.parse(await fs.promises.readFile('./messages/list.json', 'utf8')); 
+      const readMessages = JSON.parse(await fs.promises.readFile('./messages/read_messages.json', 'utf-8'));
+    
+      const unreadMessages = existingMessages.filter(message => !readMessages.includes(message.id));
+
+      console.log('\\n\\n' + chalk.bold.blue('[DARKMESSENGER NOTIFICATION]') + ' Found ' + chalk.bold.yellow(unreadMessages.length) + ' new messages. \\n\\nRun ' + chalk.bold.yellow('./DarkMessenger show') + ' to mark them as read. \\n\\nIf you want to disable notifications for new messages set ' + chalk.italic.white('"alert_on_new_messages": false,') + ' at ./config/dark-messenger.json\\n\\n' );
+    };
+
+    setInterval(checkNewMessages, ${config?.check_new_messages_seconds * 1000 || 15000} );
+
+    fs.writeFileSync('./message_alert_server.pid', process.pid.toString());
+  `;
+
+  return script.trim(); 
+}
+
+const writeMessageAlertServerScript = async (scriptContent) => {
+  try {
+    await fs.promises.writeFile('./startMessageAlertServer.js', scriptContent);
+    verbose('startMessageAlertServer.js file has been created successfully.');
+  } catch (err) {
+    error(`Failed to write startMessageAlertServer.js: ${err}`);
+  }
+}
+
+const startMessageAlertServer = () => {
+  debug(`Running chmod 775 over ./startMessageAlertServer.js ... `);
+  fs.chmod("./startMessageAlertServer.js", 0o775, (err) => {
+    if (err) {
+      error(`CRITICAL: Error running chmod 775 over ./startMessageAlertServer.js: ${err}`);
+      exit();
+    }
+    debug(`./startMessageAlertServer.js is now executable`);
+  });
+
+  verbose(`Starting MessageAlert Server ...`);
+  const internalProcess = spawn("./startMessageAlertServer.js", [], {
+    detached: true,
+    stdio: ['ignore', process.stdout, process.stderr]
+  });
+
+  debug(`Detaching MessageAlert Server process from node process ...`);
+  internalProcess.unref();
+
+  internalProcess.on('error', (err) => {
+    error(`Error Starting MessageAlert Server: ${err}`);
+  });
+
+  internalProcess.on("close", (code) => {
+    verbose(`Closing MessageAlert Server ...`);
+    debug(`MessageAlert Server process closing with code: ${code}`);
+  });
+}
+
+
+
+const stopMessageAlertServer = () => {
+  debug(`Extracting MessageAlert server process id from ./message_alert_server.pid ... `);
+  if (fs.existsSync("./message_alert_server.pid")) {
+    const pid = +fs.readFileSync("./message_alert_server.pid").toString();
+    debug(`Extracted pid: ${pid}`);
+
+    try {
+      verbose(`Stopping MessageAlert Server`);
+      debug(`Sending SIGTERM signal to MessageAlert server process id ${pid}`);
+      process.kill(pid, 'SIGTERM');
+      console.log("MessageAlert Server successfully stopped.");
+      debug(`Deleting ./message_alert_server.pid file ...`);
+      fs.unlinkSync("./message_alert_server.pid");
+      debug(`./message_alert_server.pid has been deleted`);
+      debug("Deleting ./startMessageAlertServer.js ...");
+      fs.unlinkSync("./startMessageAlertServer.js");
+      debug("./startMessageAlertServer.js has been deleted");
+    } catch (err) {
+      error(`Unable to terminate MessageAlert server process with PID ${pid}: ${err}`);
+    }
+  } else {
+    error(`./message_alert_server.pid can't be found`);
+  } 
+}
+
