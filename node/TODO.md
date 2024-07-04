@@ -15,3 +15,4 @@
 - Check if service files can be deleted once spawned, if not just hidde them using a dot before the filename
 - Develop all the cli interfaces into browser
 - Develop the browser GUI
+- Check read messages (possible bug reusing ids of already read messages so new messanges are not notified. Probably fixable just by removing the id from read_messages.json when removing messages using the delete messages from cli function)
