@@ -33,7 +33,7 @@ Usage:
 start          Wake up all services
 stop           Shutdown all services
 
-add [alias] [domain.onion]          Add an address to your Address Book
+add [alias] [domain.onion]           Add an address to your Address Book
 addme [domain.onion]                 Tell remote server to add you
 contact <alias>                      Show a contact address or all contacts
 send [alias] [message]               Send a message
