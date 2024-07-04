@@ -18,3 +18,10 @@
 - Check read messages (possible bug reusing ids of already read messages so new messanges are not notified. Probably fixable just by removing the id from read_messages.json when removing messages using the delete messages from cli function)
 - Ask user for username the first time running the program and add it to the config/dark_messenger.json
 - Make sure start files are not included (.gitignore)
+
+
+#### End Goals
+- APK
+- Web App
+- ClI
+- Official Web App online

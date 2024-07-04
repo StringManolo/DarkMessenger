@@ -391,7 +391,7 @@ const start = async (cli) => {
       debug(`./hidden_service folder dosn't exist yet. Making it ...`);
       fs.mkdirSync("./hidden_service", { recursive: true });
       debug(`Setting hidden_service folder permissions ...`);
-      fs.chmodSync(path, 0o700);
+      fs.chmodSync("./hidden_service", 0o700);
     }
 
     if (!fs.existsSync("./logs")) {
