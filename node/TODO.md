@@ -1,5 +1,4 @@
 - Make sure multiple start commands in a row don't make unintended errors
-- Make an interface to connect the browser (WEB GUI) to an express server thst handle the http requests itself (proxy)
 - Implement the request back on add to request the other server to add you back
 - Check that there is not same alias multiple times in address book (rename the following ocurrencies?)
 - Add publickey sharing / encryption
@@ -13,3 +12,6 @@
 - Add more args for the config files
 - Add to config an option to run ./DarMessenger start when system boots
 - Add options cli to change directly the dark_messenger.config file from the cli
+- Check if service files can be deleted once spawned, if not just hidde them using a dot before the filename
+- Develop all the cli interfaces into browser
+- Develop the browser GUI

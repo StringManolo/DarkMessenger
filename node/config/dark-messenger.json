@@ -1,19 +1,33 @@
 {
-  "username": "StringManolo",
-  "use_web_gui": true,
-  "web_gui_address": "127.0.0.1",
-  "web_gui_port": 9000,
+"comment": "username is the name other users are going to use to send you messages", 
+    "username": "StringManolo",
+  
+
+"comment": "web_gui allws you to use DarkMessenger from your browser as a web app if you prefer it over commandline",
+"comment": "use_web_gui also activates http_tor_proxy_url",
+    "use_web_gui": true,
+    "web_gui_address": "127.0.0.1",
+    "web_gui_port": 9000,
+    "http_tor_proxy_url": "http://127.0.0.1:9002/",
+    "http_tor_proxy_port": 9002,
+
+ 
+"comment": "This is the local address binded to your .onion. Allows you to recive messages routed from tor network",
   "hidden_service_address": "127.0.0.1",
+"comment": "Get's automatically your .onion address",
   "hidden_service_hostname": "auto",
   "hidden_service_port": 9001,
-  "http_tor_proxy_url": "http://127.0.0.1:9002/",
+  
   "tor_socks_url": "127.0.0.1:9050",
-
   "add_back": true,
 
+
+"comment": "You will receive a terminal  notification when someone sends you a new message", 
   "alert_on_new_messages": true,
   "check_new_messages_seconds": 20,
 
+
+"comment": "Terminal default output options",
   "verbose": true,
   "debug": true,
   "debug_with_time": true
