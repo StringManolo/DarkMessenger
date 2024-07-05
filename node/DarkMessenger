@@ -500,6 +500,9 @@ const start = async (cli) => {
     debug(`Config not found. This is can't never happen btw`);
   }
 
+  if (config?.hidden_service_hostname) {
+    console.log(`\nYour address is ${chalk.bold.yellow(config.hidden_service_hostname)}. You can copy to share it with your friends.\n\n`);
+  }
 };
 
 const stop = async (cli) => {
