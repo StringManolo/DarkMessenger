@@ -833,6 +833,14 @@ const generateHiddenServerScript = (config) => {
         return res.status(500).send('Internal Error reading address book');
       }
 
+      /* Avoid alias Spoofing */
+      for (let i in addressBook) {
+        const auxAlias = addressBook[i].split(" ")[0];
+        if (auxAlias == alias) {
+          return res.status(409).send(\`Alias "\${alias}" already exists\`);
+        }
+      }
+
       addressBook.push(\`\${alias} \${address}\`);
       const uniqueEntries = new Set(addressBook);
        
