@@ -164,7 +164,7 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
       process.exit(0);
     }
 
-    const result = await curl(`http://${cli.o[1][0]}`, `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`);
+    const result = await curl(`${cli.o[1][0]}`, `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`);
     debug(`Result: ${result}`);
   } catch(err) {
     error(`Error on Add() : ${err}`);
@@ -192,7 +192,7 @@ const send = async (cli) => {
     config = await loadConfig("./config/dark-messenger.json");
 
     debug(`Sending message ... `);
-    const result = await curl(`http://${address}`, `send -d '{ "from":"${config.username}", "message":"${Buffer.from(message).toString('base64')}" }' -H 'Content-Type: application/json'`);
+    const result = await curl(`${address}`, `send -d '{ "from":"${config.username}", "message":"${Buffer.from(message).toString('base64')}" }' -H 'Content-Type: application/json'`);
     console.log(result); 
 
   } catch(err) {
