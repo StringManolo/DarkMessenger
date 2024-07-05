@@ -19,10 +19,10 @@ apk add tor git nodejs npm curl
 ### Install
 ```bash
 git clone https://github.com/StringManolo/DarkMessenger;
-cd DarkMessenger/node/;
+cd DarkMessenger;
 npm i
 
-./DarkMessenger
+./DarkMessenger.js
 ```
 
 ### Usage
@@ -41,7 +41,6 @@ send [alias] [message]               Send a message
 show <alias>                         Show messages from someone
 delete [id]                          Delete messages from someone
 
--c --config <filename>
 -v --verbose
 -d --debug
 ```

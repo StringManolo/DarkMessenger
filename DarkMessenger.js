@@ -27,7 +27,6 @@ ${chalk.bold.yellow('send')} ${chalk.italic('[alias] [message]')}               
 ${chalk.bold.yellow('show')} ${chalk.italic('<alias>')}                         ${chalk.white('Show messages from someone')}
 ${chalk.bold.yellow('delete')} ${chalk.italic('[id]')}                          ${chalk.white('Delete messages from someone')}
 
-${chalk.bold.yellow('-c --config')} ${chalk.italic('<filename>')}
 ${chalk.bold.yellow('-v --verbose')}
 ${chalk.bold.yellow('-d --debug')}
 `);
