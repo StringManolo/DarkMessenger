@@ -91,6 +91,8 @@ Delete messages from a contact:
 
 ## Configuration
 
+*Default config files are included within the repository. (You do not need to change anything in this files for the program to work).*
+
 Your main configuration file is `config/dark-messenger.json`. Key settings include:
 
 - `username`: The name other users will use to send you messages.
