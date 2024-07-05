@@ -141,3 +141,5 @@ AvoidDiskWrites 1
 Contributions are welcome! Please feel free to submit a pull request or open an issue if you have any suggestions or improvements.
 
 ## FAQ
+
+If you have questions, click [here](https://github.com/StringManolo/DarkMessenger/blob/main/FAQ.md) to open the FAQ.
