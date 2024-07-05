@@ -34,6 +34,8 @@
 - Add black abd white list of users (maybe for spammers too)
 - Think about ideas to manage offline messaging
 - Test custom config file passed as arg
+- Add a profile page (optional) by binding a new http service to answer to browsers navigating to the onion url. (Add it in config/dark-messenger.json) (Use a default page showing info about the DarkMessenger project)
+
 
 ### Contribute
 If you want to help out, fork the repo, complete any of this taks, push the changes to your repo, make a pull request.  
