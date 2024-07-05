@@ -83,7 +83,7 @@ Show messages from a contact or all contacts:
 ./DarkMessenger.js show <alias>
 ```
 
-Delete messages from a contact:
+Delete a message by their id:
 
 ```bash
 ./DarkMessenger.js delete [id]
