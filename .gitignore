@@ -1,2 +1,13 @@
+node_modules/*
+tor_files/*
+hidden_service/*
 logs/*
-scripts/servers/hidden_service/hidden_service_files/*
+startGuiServer.js
+startHiddenServer.js
+startMessageAlertServer.js
+startProxyServer.js
+gui_server.pid
+hidden_server.pid
+message_alert_server.pid
+proxy_server.pid
+tor_files/tor.pid
