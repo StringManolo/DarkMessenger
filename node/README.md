@@ -27,7 +27,7 @@ npm i
 
 ### Usage
 ```bash
-./DarkMessenger
+./DarkMessenger.js
 
 Usage:
 
@@ -36,7 +36,7 @@ stop           Shutdown all services
 
 add [alias] [domain.onion]           Add an address to your Address Book
 addme [domain.onion]                 Tell remote server to add you
-contact <alias>                      Show a contact address or all contacts
+contacts <alias>                     Show a contact address or all contacts
 send [alias] [message]               Send a message
 show <alias>                         Show messages from someone
 delete [id]                          Delete messages from someone
@@ -45,3 +45,5 @@ delete [id]                          Delete messages from someone
 -v --verbose
 -d --debug
 ```
+
+

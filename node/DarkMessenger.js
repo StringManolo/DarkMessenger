@@ -4,6 +4,7 @@ import fs from "fs";
 import { spawn, exec } from "child_process";
 import parseCLI from "simpleargumentsparser";
 import chalk from "chalk";
+import readline from "readline";
 
 // globals
 let v = false; // verbose
@@ -91,6 +92,18 @@ const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+const ask = question => {
+  return new Promise(resolve => {
+    rl.question(question, answer => {
+      resolve(answer);
+    });
+  });
+};
 
 const curl = async (url, args) => {
   return new Promise((resolve, reject) => {
@@ -420,6 +433,17 @@ const start = async (cli) => {
   verbose("Verbose Activated");
   debug("Debug Activated");
 
+  if (!config?.username) {
+    let tmpUsername = "";
+    do {
+      tmpUsername = await ask("Please provide a username / alias -> ");
+    } while (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(tmpUsername));
+
+    config.username = tmpUsername;
+    // save username in config:
+    fs.writeFileSync("./config/dark-messenger.json", JSON.stringify(config, null, 4));
+  }
+
   if (fs.existsSync("./tor_files/tor.pid")) {
     const torPid = await fs.promises.readFile("./tor_files/tor.pid");
     verbose(`Tor already running with pid ${torPid}`);
@@ -534,6 +558,8 @@ const start = async (cli) => {
   if (config?.hidden_service_hostname) {
     console.log(`\nYour address is ${chalk.bold.yellow(config.hidden_service_hostname)}. You can copy to share it with your friends.\n\n`);
   }
+
+  process.exit(0);
 };
 
 const stop = async (cli) => {
@@ -556,10 +582,14 @@ const stop = async (cli) => {
 
   console.log(`Stopping All Services...`);
   stopMessageAlertServer();
-  stopGuiServer();
-  stopProxyServer();
+  if (config?.use_web_gui) {
+    stopGuiServer();
+    stopProxyServer();
+  }
   stopHiddenServer();
   stopTor();
+
+  process.exit(0);
 };
 
 const loadFile = async (path) => {
