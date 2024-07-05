@@ -34,7 +34,7 @@
 - Add pass auth to hidden_services to make the onion address only reachable for users that known the password (maybe port knowcking to alert of an auth req?)
 - Add chat groups
 - Allow to delete all messages or delete multiple by multiple ids in cli
-
+- Add black abd white list of users (maybe for spammers too)
 
 ### Contribute
 If you want to help out, fork the repo, complete any of this taks, push the changes to your repo, make a pull request.  
