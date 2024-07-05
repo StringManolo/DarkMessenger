@@ -136,6 +136,9 @@ ORPort 0
 AvoidDiskWrites 1
 ```
 
+## Public Lists
+[https://github.com/StringManolo/DarkMessengerLists/blob/main/README.md](https://github.com/StringManolo/DarkMessengerLists/blob/main/README.md)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue if you have any suggestions or improvements.
