@@ -1,4 +1,4 @@
-# Node version of Dark Messenger
+# Dark Messenger
 Dark Messenger is a "p2p" messaging app that uses Tor Network to bypass ISP restrictions and exit CGNAT networks, allowing you to communicate in a decentralized network. 
 
 ### Requeriments
