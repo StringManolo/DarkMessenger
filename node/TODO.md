@@ -4,7 +4,6 @@
 
 - (Maybe a clean is needed if processes are not running but .pid files exist cuz user forced a close without using ./DarkMessenger stop)
 - Implement the request back on add to request the other server to add you back
-- Check that there is not same alias multiple times in address book (rename the following ocurrencies?)
 - Add publickey sharing / encryption
 - Manage v and d vars in functions based on config / args (maybe make a pure check funcion to set them by loading config file + args). 
 - Update the readme
@@ -22,7 +21,6 @@
 - Develop the browser GUI
 - Ask user for username the first time running the program and add it to the config/dark_messenger.json
 - Fix curl port usage to use config port number (--socks5)
-- Add checks if cli args (for example add alias address) make sure they are valid with regexp
 - Show help when not known command
 - Allow profile picture, description, etc
 - Add messages on each contact load (maybe need to implement api on hidden server instead of hardcoding using the code generator)

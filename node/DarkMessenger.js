@@ -191,7 +191,7 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
     }
 
     if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(cli.o[1][0])) {
-      error(`Onion address is not valid, preveting useless request ...`);
+      error(`Onion address is not valid, preventing useless request ...`);
       process.exit(0);
     }
 
