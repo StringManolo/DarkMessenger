@@ -302,11 +302,16 @@ const del = async (cli) => {
     const messagesRAW = await fs.promises.readFile('./messages/list.json', 'utf8');
     let messages = JSON.parse(messagesRAW);
 
-    debug(`Messages  prefilter: ${messages}`);
+    debug(`Removing message ...`);
     messages = messages.filter(message => +message.id !== +id);
-    debug(`Messages postfilter: ${messages}`);
 
     await fs.promises.writeFile('./messages/list.json', JSON.stringify(messages, null, 2));
+
+    debug(`Making id free from ./messages/read_messages.json ...`);
+    let readMessages = JSON.parse(await fs.promises.readFile("./messages/read_messages.json"));
+    readMessages = readMessages.filter(readId => +readId !== +id);
+    await fs.promises.writeFile('./messages/read_messages.json', JSON.stringify(readMessages, null, 2)); 
+
   } catch(err) {
     error(`Unable to delete message: ${err}`);
   }
