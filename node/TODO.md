@@ -29,7 +29,7 @@
 - Add the onion url on the send api when moving to a contact group 
 - Save send messages (just to be shown in the GUI contacts message list)
 - Add log output for all services into ./logs
-
+- Add version and an update command that shows changes made from versions (prob with a local file CHANGUES and a cat with a filter per version)
 ### Contribute
 If you want to help out, fork the repo, complete any of this taks, push the changes to your repo, make a pull request.  
 
