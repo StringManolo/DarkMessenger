@@ -206,7 +206,7 @@ const contacts = async (cli) => {
   d = true;
 
   const alias = cli.o?.[1]?.[0];
-  let foundContacts = false;
+  // let foundContacts = false;
   let result = false;
 
   try {
@@ -234,6 +234,7 @@ const contacts = async (cli) => {
   } else {
     console.log("Unable to find");
   }
+
 }
 
 
@@ -541,6 +542,7 @@ const loadConfig = async (path) => {
   }
 };
 
+
 const generateGuiServerScript = (config) => {
   const script = `#!/usr/bin/env node
     import fs from "fs";
@@ -549,6 +551,18 @@ const generateGuiServerScript = (config) => {
     const app = express();
     const port = ${config?.web_gui_port || 9000};
     const hostname = "${config?.web_gui_address || "127.0.0.1"}";
+    let contacts = fs.readFileSync("./address_book/list.txt", "utf-8") || null;
+    let auxContacts = "";
+    if (contacts) {
+      // TODO: FIX -> XSS / HTMLi here:
+      auxContacts = contacts.split("\\n")
+        .map(line => line.length > 2 ? \`<article class="contactName" onion="\${line.split(" ")[1]}">\${line.split(" ")[0]}</article>\` : "");
+      contacts = "<section id='contacts'>";
+      contacts += auxContacts.join("\\n");
+      contacts += "</section>"
+    } else {
+      contacts = "No contacts found";
+    }
 
     app.get('/', (req, res) => {
       res.send(\`<!DOCTYPE html>
@@ -563,29 +577,113 @@ const generateGuiServerScript = (config) => {
     body {
       margin: 0;
       padding: 0;
-    }
-    body {
-      background-color: black;
+      font-family: Arial, sans-serif;
+      background-color: #2c2f33;
       color: snow;
+      display: flex;
+      flex-direction: column;
+      width: 90%;
+    }
+    #messageInput {
+      display: flex;
+      flex-direction: row;
+      padding: 10px;
+    }
+    #sendMessageInput {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #40444b;
+      color: white;
+    }
+    #sendMessageButton {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #7289da;
+      color: white;
+    }
+    #contacts {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      color: white;
+    }
+    .contactName {
+      display: flex;
+      flex: 1;
+      border-bottom: 2px solid black;
+      font-size: 30px;
+      margin-left: 50px; /* Tmp margin for future profile picture */
+    }
+    .hidden {
+      display: none !important;
+    }
+    #contactHeader {
+      display: none;
+      align-items: center;
+      padding: 10px;
+    }
+    #backButton {
+      cursor: pointer;
+      margin-right: 20px;
+    }
+    #contactNameDisplay {
+      font-weight: bold;
+      flex: 1;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>Dark Messenger</h1>
-  <button onclick="sendMessage()">Send msg</button>
+  <div id="contacts">
+    <!-- TODO: Avoid XSS / HTMLi -->
+    \${contacts}
+  </div>
+  <div id="contactHeader">
+    <span id="backButton">←</span>
+    <div id="contactNameDisplay"></div>
+  </div>
+  <div id="messageInput" class="hidden">
+    <input type="text" placeholder="Type a message..." id="sendMessageInput">
+    <button id="sendMessageButton" onclick="sendMessage()">Send</button>
+  </div>
   <script>
-    function showAlert(message) {
-      alert(message);
-    }
+    let currentView = "main";
+    const contacts = document.querySelectorAll(".contactName");
+    const contactsContainer = document.querySelector("#contacts");
+    const contactHeader = document.querySelector("#contactHeader");
+    const contactNameDisplay = document.querySelector("#contactNameDisplay");
+    const messageInput = document.querySelector("#messageInput");
+    const backButton = document.querySelector("#backButton");
 
-    function sendMessage() {
-      const message = 'test Browser message';
+    contacts.forEach(contact => {
+      contact.addEventListener("click", (evnt) => {
+        currentView = "contact." + evnt.target.innerHTML;
+        contactNameDisplay.innerHTML = evnt.target.innerHTML;
+        contactsContainer.classList.add("hidden");
+        contactHeader.style.display = "flex";
+        messageInput.classList.remove("hidden");
+      });
+    });
 
+    backButton.addEventListener("click", () => {
+      contactsContainer.classList.remove("hidden");
+      contactHeader.style.display = "none";
+      messageInput.classList.add("hidden");
+    });
+
+    const sendMessage = () => {
+      const message = document.querySelector("#sendMessageInput").value;
+      if (!message || message.length < 1) {
+        alert("Message can't be void");
+        return;
+      }
       const requestData = {
-        from: '${config?.username || unknown}',
-        message: btoa(message) 
+        from: '${config?.username || "unknown"}',
+        message: btoa(message)
       };
-
       fetch('${config?.http_tor_proxy_url || "http://127.0.0.1:9002/"}http://${config?.hidden_service_hostname || "127.0.0.1"}:${config?.hidden_service_port || 9001}/send', {
         method: 'POST',
         headers: {
@@ -594,20 +692,17 @@ const generateGuiServerScript = (config) => {
         body: JSON.stringify(requestData)
       })
      .then(response => response.text())
-     .then(data => showAlert('Respuesta: ' + data))
-     .catch(error => showAlert('Error: ' + error.message));
-   }
-
-
-
+     .then(data => alert(data))
+     .catch(error => alert('Error: ' + error.message));
+    }
   </script>
 </body>
 </html>
-    \`);
+      \`);
     });
 
     const server = app.listen(port, hostname, () => {
-      console.log('GUI Server listening at http://\${hostname}:\${port}');
+      console.log(\`GUI Server listening at http://\${hostname}:\${port}\`);
       fs.writeFileSync('./gui_server.pid', process.pid.toString());
     });
 
@@ -623,6 +718,8 @@ const generateGuiServerScript = (config) => {
 
   return script.trim();
 };
+
+
 
 const writeGuiServerScript = async (scriptContent) => {
   try {

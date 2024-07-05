@@ -26,6 +26,9 @@
 - Fix curl port usage to use config port number (--socks5)
 - Add checks if cli args (for example add alias address) make sure they are valid with regexp
 - Show help when not known command
+- Allow profile picture, description, etc
+- Add messages on each contact load (maybe need to implement api on hidden server instead of hardcoding using the code generator)
+- Add the onion url on the send api when moving to a contact group 
 
 ### Contribute
 If you want to help out, fork the repo, complete any of this taks, push the changes to your repo, make a pull request.  
