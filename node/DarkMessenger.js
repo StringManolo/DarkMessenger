@@ -184,6 +184,17 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
       process.exit(0);
     }
 
+    /* Avoid making useless requests client side */
+    if (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(config?.username)) {
+      error(`Your username is not valid. Only alphanumeric characters.\nNext characters are also allowed: - _ . @`);
+      process.exit(0);
+    }
+
+    if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(cli.o[1][0])) {
+      error(`Onion address is not valid, preveting useless request ...`);
+      process.exit(0);
+    }
+
     const result = await curl(`${cli.o[1][0]}`, `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`);
     debug(`Result: ${result}`);
   } catch(err) {
@@ -835,6 +846,18 @@ const generateHiddenServerScript = (config) => {
     */
     app.post('/addme', async (req, res) => {
       const { alias, address } = req.body;
+
+      if (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(alias)) {
+        console.error(\`Username is not valid\`);
+        return res.status(422).send("Username/Alias is not valid");
+      }                                                                                
+      if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(address)) {
+        console.error(\`Onion address is not valid, preveting useless request ...\`);
+        return res.status(400).send("Onion address dosn't seem valid. Expected a real domain.onion address");
+      }
+
+
+
       let addressBook = [];
       try {
         const data = await fs.promises.readFile('./address_book/list.txt', 'utf8');
