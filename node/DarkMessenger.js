@@ -120,6 +120,17 @@ const add = async (cli) => {
   const address = cli.o?.[2]?.[0];
   debug(`Alias: (${alias}), Address (${address})`);
 
+  debug(`Testing if alias is a valid format ...`);
+  if (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(alias)) {
+    error(`Alias can only use alphanumeric charcaters and be 1 to 99 characters long. \nThis characters are also alloweed: - _ . @`);
+    process.exit(0);
+  }
+
+  debug(`Testing if onion address is valid ...`);
+  if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(address)) {
+    error(`The onion address is not valid. Make sure you adding a real address`);
+    process.exit(0);
+  }
 
   let addressBook = [];
   try {
