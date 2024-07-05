@@ -6,3 +6,4 @@
 - Add an message spam detection
 - Add a rate limit for requests per second, also per min (in config)
 - Try to ddos the app with non closing tunnels
+- Filter the dinamic elements in the GUI (Currently they are vuln to XSS and HTMLi

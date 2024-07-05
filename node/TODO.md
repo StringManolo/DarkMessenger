@@ -29,6 +29,7 @@
 - Allow profile picture, description, etc
 - Add messages on each contact load (maybe need to implement api on hidden server instead of hardcoding using the code generator)
 - Add the onion url on the send api when moving to a contact group 
+- Save send messages (just to be shown in the GUI contacts message list)
 
 ### Contribute
 If you want to help out, fork the repo, complete any of this taks, push the changes to your repo, make a pull request.  
