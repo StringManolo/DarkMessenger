@@ -35,6 +35,7 @@
 - Add chat groups
 - Allow to delete all messages or delete multiple by multiple ids in cli
 - Add black abd white list of users (maybe for spammers too)
+- Think about ideas to manage offline messaging
 
 ### Contribute
 If you want to help out, fork the repo, complete any of this taks, push the changes to your repo, make a pull request.  

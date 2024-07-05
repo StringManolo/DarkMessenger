@@ -133,6 +133,15 @@ const add = async (cli) => {
     process.exit(0);
   }
 
+  /* Check for duplicates to prevent username spoofing */
+  for (let i in addressBook) {
+    const auxAlias = addressBook[i].split(" ")[0];
+    if (auxAlias == alias) {
+      error(`Alias "${alias}" already exists, use a different alias`);
+      process.exit(0);
+    }
+  }
+
   debug(`Adding new entry to in-memory address book ... `);
   addressBook.push(`${alias} ${address}`);
   debug(`Removing all duplicates (if there is any) ... `);
