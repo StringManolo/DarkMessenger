@@ -8,3 +8,4 @@
 - Try to ddos the app with non closing tunnels
 - Filter the dinamic elements in the GUI (Currently they are vuln to XSS and HTMLi
 - Add internal autogen credentials to avoid webpages/browser/appd making requests to local ports
+- Hardening of tor service
