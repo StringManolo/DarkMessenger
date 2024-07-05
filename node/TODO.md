@@ -33,6 +33,7 @@
 - Make hidden_service optional in config
 - Add pass auth to hidden_services to make the onion address only reachable for users that known the password (maybe port knowcking to alert of an auth req?)
 - Add chat groups
+- Allow to delete all messages or delete multiple by multiple ids in cli
 
 
 ### Contribute
