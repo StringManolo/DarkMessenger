@@ -21,7 +21,6 @@
 - Develop all the cli interfaces into browser
 - Develop the browser GUI
 - Ask user for username the first time running the program and add it to the config/dark_messenger.json
-- Make sure start files are not included (.gitignore)
 - Fix curl port usage to use config port number (--socks5)
 - Add checks if cli args (for example add alias address) make sure they are valid with regexp
 - Show help when not known command
