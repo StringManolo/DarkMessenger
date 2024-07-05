@@ -15,6 +15,7 @@
 - Add more verbose and debug
 - Add more args for the config files
 - Add to config an option to run ./DarkMessenger start when system boots
+- Add to config an option to run ./DarkMessenger stop when system shutdowns (maybe with bash trap?)
 - Add options cli to change directly the dark_messenger.config file from the cli
 - Check if service files can be deleted once spawned, if not just hidde them using a dot before the filename
 - Develop all the cli interfaces into browser
