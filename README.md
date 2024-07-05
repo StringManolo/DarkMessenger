@@ -77,7 +77,7 @@ Send a message to a contact:
 ./DarkMessenger.js send [alias] [message]
 ```
 
-Show messages from a contact:
+Show messages from a contact or all contacts:
 
 ```bash
 ./DarkMessenger.js show <alias>
