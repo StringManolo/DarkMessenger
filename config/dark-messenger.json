@@ -1,27 +1,36 @@
 {
-    "comment1": "username is the name other users are going to use to send you messages",
-    "username": "stringmanolo",
-    "comment2": "web_gui allows you to use DarkMessenger from your browser as a web app if you prefer it over commandline",
-    "comment3": "use_web_gui also activates http_tor_proxy_url",
+"comment1": "username is the name other users are going to use to send you messages",
+    "username": false,
+
+
+"comment2": "web_gui allows you to use DarkMessenger from your browser as a web app if you prefer it over commandline",
+"comment3": "use_web_gui also activates http_tor_proxy_url",
     "use_web_gui": false,
     "web_gui_address": "127.0.0.1",
     "web_gui_port": 9000,
     "http_tor_proxy_url": "http://127.0.0.1:9002/",
     "http_tor_proxy_port": 9002,
-    "comment4": "hidden_service_address is the local address binded to your .onion. Allows you to recive messages routed from tor network",
+
+
+"comment4": "hidden_service_address is the local address binded to your .onion. Allows you to recive messages routed from tor network",
     "hidden_service_address": "127.0.0.1",
-    "comment5": "Get's automatically your .onion address",
+"comment5": "Get's automatically your .onion address",
     "hidden_service_hostname": "auto",
     "hidden_service_port": 9001,
+
     "tor_socks_url": "127.0.0.1:9050",
-    "comment6": "If allow_addme is set to true, you will allow anyone to request be added to your contact list",
+
+"comment6": "If allow_addme is set to true, you will allow anyone to request be added to your contact list",
     "allow_addme": true,
-    "comment7": "If add_back is set to true, you will automatically add back to your contact list anyone that requested you to add him remotelly",
+"comment7": "If add_back is set to true, you will automatically add back to your contact list anyone that requested you to add him remotelly",
     "add_back": true,
-    "comment8": "if alert_on_new_messages is true You will receive a terminal notification when someone sends you a new message",
+
+
+"comment8": "if alert_on_new_messages is true You will receive a terminal notification when someone sends you a new message",
     "alert_on_new_messages": true,
     "check_new_messages_seconds": 20,
-    "comment9": "Terminal default output options",
+
+"comment9": "Terminal default output options",
     "verbose": true,
     "debug": true,
     "debug_with_time": true
