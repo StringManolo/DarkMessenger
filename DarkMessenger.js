@@ -221,12 +221,12 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
   }
 
   if (config?.add_back) {
-    if (await ask("Do you want to add the address to your contact list too? [Y/N] -> ").toUpperCase() === "Y" ) {
+    if ( (await ask("Do you want to add the address to your contact list too? [Y/N] -> ")).toUpperCase() === "Y" ) {
       let tmpUsername = "";
       do {
         tmpUsername = await ask("Please provide a username / alias for the contact -> ");
       } while (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(tmpUsername));
-      cli.o[2][0] = cli.o[1][0]; // set address
+      cli.o[2] = [cli.o[1][0]]; // set address
       cli.o[1][0] = tmpUsername; // set username
       await add(cli);
     }
