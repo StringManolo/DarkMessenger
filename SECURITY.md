@@ -11,3 +11,4 @@
 - Add internal autogen credentials to avoid webpages/browser/apps making requests to local ports
 - Hardening of tor service
 - ??? Add support for TLS generating Let's encrypt certs per .onion domain (Only needed for clearnet, not supported yet)
+- Add support for an additional layer of E2E encryption (optional in ./config/dark-messenger.json)
