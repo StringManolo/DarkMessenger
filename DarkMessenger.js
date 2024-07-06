@@ -218,6 +218,7 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
     debug(`Result: ${result}`);
   } catch(err) {
     error(`Error on Add() : ${err}`);
+    process.exit(0);
   }
 
   if (config?.add_back) {
