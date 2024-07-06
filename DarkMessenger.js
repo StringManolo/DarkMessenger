@@ -220,7 +220,7 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
     error(`Error on Add() : ${err}`);
   }
 
-  if (cli?.add_back) {
+  if (config?.add_back) {
     if (await ask("Do you want to add the address to your contact list too? [Y/N] -> ").toUpperCase() === "Y" ) {
       let tmpUsername = "";
       do {
