@@ -874,7 +874,7 @@ const generateHiddenServerScript = (config) => {
      * curl --socks5-hostname 127.0.0.1:9050 http://4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion:9001/addme -d '{ "alias": "sm", "address": "sm.onion" }' -H "Content-Type: application/json"
     */
 
-    if (config?.allow_addme === true) {
+    if (${config?.allow_addme} === true) {
       app.post('/addme', async (req, res) => {
         const { alias, address } = req.body;
 
