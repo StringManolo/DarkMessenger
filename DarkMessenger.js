@@ -873,51 +873,57 @@ const generateHiddenServerScript = (config) => {
     /* Req Example:
      * curl --socks5-hostname 127.0.0.1:9050 http://4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion:9001/addme -d '{ "alias": "sm", "address": "sm.onion" }' -H "Content-Type: application/json"
     */
-    app.post('/addme', async (req, res) => {
-      const { alias, address } = req.body;
 
-      if (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(alias)) {
-        console.error(\`Username is not valid\`);
-        return res.status(422).send("Username/Alias is not valid");
-      }                                                                                
-      if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(address)) {
-        console.error(\`Onion address is not valid, preveting useless request ...\`);
-        return res.status(400).send("Onion address dosn't seem valid. Expected a real domain.onion address");
-      }
+    if (config?.allow_addme === true) {
+      app.post('/addme', async (req, res) => {
+        const { alias, address } = req.body;
 
-
-
-      let addressBook = [];
-      try {
-        const data = await fs.promises.readFile('./address_book/list.txt', 'utf8');
-        addressBook = data.split('\\n').map(line => line.trim()).filter(line => line !== '');
-      } catch (err) {
-        console.error('Error reading file:', err);
-        return res.status(500).send('Internal Error reading address book');
-      }
-
-      /* Avoid alias Spoofing */
-      for (let i in addressBook) {
-        const auxAlias = addressBook[i].split(" ")[0];
-        if (auxAlias == alias) {
-          return res.status(409).send(\`Alias "\${alias}" already exists\`);
+        if (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(alias)) {
+          console.error(\`Username is not valid\`);
+          return res.status(422).send("Username/Alias is not valid");
+        }                                                                                
+        if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(address)) {
+          console.error(\`Onion address is not valid, preveting useless request ...\`);
+          return res.status(400).send("Onion address dosn't seem valid. Expected a real domain.onion address");
         }
-      }
 
-      addressBook.push(\`\${alias} \${address}\`);
-      const uniqueEntries = new Set(addressBook);
-       
-      const updatedText = Array.from(uniqueEntries).join('\\n');
 
-      try {
-        await fs.promises.writeFile('./address_book/list.txt', updatedText);
-        res.status(200).send("Remote server added you to it's address book");
-      } catch (err) {
-        return res.status(500).send('Internal Server Error writting address book');
-      }
 
-    });
+        let addressBook = [];
+        try {
+          const data = await fs.promises.readFile('./address_book/list.txt', 'utf8');
+          addressBook = data.split('\\n').map(line => line.trim()).filter(line => line !== '');
+        } catch (err) {
+          console.error('Error reading file:', err);
+          return res.status(500).send('Internal Error reading address book');
+        }
 
+        /* Avoid alias Spoofing */
+        for (let i in addressBook) {
+          const auxAlias = addressBook[i].split(" ")[0];
+          if (auxAlias == alias) {
+            return res.status(409).send(\`Alias "\${alias}" already exists\`);
+          }
+        }
+
+        addressBook.push(\`\${alias} \${address}\`);
+        const uniqueEntries = new Set(addressBook);
+         
+        const updatedText = Array.from(uniqueEntries).join('\\n');
+
+        try {
+          await fs.promises.writeFile('./address_book/list.txt', updatedText);
+          res.status(200).send("Remote server added you to it's address book");
+        } catch (err) {
+          return res.status(500).send('Internal Server Error writting address book');
+        }
+
+      });
+    } else {
+      app.post("/addme", async (req, res) => {
+        res.status(403).send("Remote server dosn't allow anyone to update it's contacts remotelly (config.allow_addme is not set true in ./config/dark-messenger.json). You have to ask the owner to add you manually. You can send this message to the owner");
+      });
+    }
 
     app.post('/send', async (req, res) => {
       try {
