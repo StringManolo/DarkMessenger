@@ -40,18 +40,25 @@ ${chalk.bold.yellow('-d --debug')}
   } else {
     if (cli.o[0].includes("add")) {
       await add(cli);
+      process.exit(0);
     } else if (cli.o[0].includes("addme")) {
       await addme(cli);
+      process.exit(0);
     } else if (cli.o[0].includes("contacts")) {
       await contacts(cli);
+      process.exit(0);
     } else if (cli.o[0].includes("send")) {
       await send(cli);
+      process.exit(0);
     } else if (cli.o[0].includes("show")) {
       await show(cli);
+      process.exit(0);
     } else if (cli.o[0].includes("delete")) {
       await del(cli);
+      process.exit(0);
     } else {
       // TODO: not known commands
+      process.exit(0);
     }
   }
 })();
@@ -555,7 +562,7 @@ const start = async (cli) => {
   }
 
   if (config?.hidden_service_hostname) {
-    console.log(`\nYour address is ${chalk.bold.yellow(config.hidden_service_hostname)}. You can copy to share it with your friends.\n\n`);
+    console.log(`\nYour address is ${chalk.bold.yellow(config.hidden_service_hostname)} \nYou can copy to share it with your friends.\n\n`);
   }
 
   process.exit(0);
