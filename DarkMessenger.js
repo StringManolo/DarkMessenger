@@ -6,10 +6,17 @@ import parseCLI from "simpleargumentsparser";
 import chalk from "chalk";
 import readline from "readline";
 
+import {
+  ECIES_priv_key, ECIES_pub_key, ECIES_encrypt, ECIES_decrypt,
+  RSA_priv_key, RSA_pub_key, RSA_encrypt, RSA_decrypt,
+  KYBER_priv_key, KYBER_pub_key, KYBER_encrypt, KYBER_decrypt
+} from "stringmanolo-erk";
+
 // globals
 let v = false; // verbose
 let d = false; // debug
 let config;     // config
+let useErk = false;
 
 (async () => {
   const cli = await parseCLI();
@@ -110,6 +117,29 @@ const ask = question => {
     });
   });
 };
+
+
+const generateErkKeys = (config) => {
+  if (!fs.existsSync("./ERK_keys")) {
+    debug(`Making dir ./ERK_keys/ ... `);
+    fs.mkdirSync("./ERK_keys", { recursive: true });
+  } 
+
+  if (!fs.existsSync("./ERK_keys/ECIES_private_key")) {
+    fs.writeFileSync("./ERK_keys/ECIES_public_key", ECIES_pub_key() );
+    fs.writeFileSync("./ERK_keys/ECIES_private_key", ECIES_priv_key() );
+  }
+
+  if (!fs.existsSync("./ERK_keys/RSA_private_key")) {
+    fs.writeFileSync("./ERK_keys/RSA_public_key", RSA_pub_key );
+    fs.writeFileSync("./ERK_keys/RSA_private_key", RSA_priv_key );
+  } 
+
+  if (!fs.existsSync("./ERK_keys/KYBER_private_key")) {
+    fs.writeFileSync("./ERK_keys/KYBER_public_key", KYBER_pub_key() );
+    fs.writeFileSync("./ERK_keys/KYBER_private_key", KYBER_priv_key() );
+  }
+}
 
 const curl = async (url, args) => {
   return new Promise((resolve, reject) => {
@@ -451,6 +481,27 @@ const start = async (cli) => {
 
   verbose("Verbose Activated");
   debug("Debug Activated");
+
+/*
+"dark_messenger_cryptography": {                                                                       "use_erk": true,
+       "offline_messages": {
+         "ecies": true,
+         "rsa": true,
+         "crystal_kyber": true
+       },
+       "online_messages": {                                                                                   "ecies": false,                                                                                      "rsa": false,
+         "crystal_kyber": false
+       },
+       "add_me": {                                                                                            "ecies": true,
+         "rsa": true,
+         "crystal_kyber": true
+       }
+     }
+*/
+  if (config?.dark_messenger_cryptography?.use_erk) {
+    useErk = true; 
+    generateErkKeys(config);
+  }
 
   if (!config?.username) {
     let tmpUsername = "";
