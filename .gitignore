@@ -2,6 +2,7 @@ node_modules/*
 tor_files/*
 hidden_service/*
 logs/*
+ERK_keys/*
 startGuiServer.js
 startHiddenServer.js
 startMessageAlertServer.js
@@ -11,3 +12,4 @@ hidden_server.pid
 message_alert_server.pid
 proxy_server.pid
 tor_files/tor.pid
+
