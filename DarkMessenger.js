@@ -63,6 +63,12 @@ ${chalk.bold.yellow('-d --debug')}
     } else if (cli.o[0].includes("delete")) {
       await del(cli);
       process.exit(0);
+    } else if (cli.o[0].includes("wcdyu")) { // Internal Method: What Crypto Do You Use (query server for available crypto)
+      await wcdyu(cli);
+      process.exit(0);
+    } else if (cli.o[0].includes("erk")) { // Internal Method: Get server ERK public key
+      await getPublicKey(cli);
+      process.exit(0);
     } else {
       // TODO: not known commands
       process.exit(0);
@@ -125,19 +131,102 @@ const generateErkKeys = (config) => {
     fs.mkdirSync("./ERK_keys", { recursive: true });
   } 
 
+  const eciesKeys = [ ECIES_pub_key(), ECIES_priv_key() ];
+  const rsaKeys = [ RSA_pub_key(), RSA_priv_key() ];
+  const kyberKeys = [ KYBER_pub_key(), KYBER_priv_key() ];
+
   if (!fs.existsSync("./ERK_keys/ECIES_private_key")) {
-    fs.writeFileSync("./ERK_keys/ECIES_public_key", ECIES_pub_key() );
-    fs.writeFileSync("./ERK_keys/ECIES_private_key", ECIES_priv_key() );
+    fs.writeFileSync("./ERK_keys/ECIES_public_key", eciesKeys[0] );
+    fs.writeFileSync("./ERK_keys/ECIES_private_key", eciesKeys[1] );
   }
 
   if (!fs.existsSync("./ERK_keys/RSA_private_key")) {
-    fs.writeFileSync("./ERK_keys/RSA_public_key", RSA_pub_key );
-    fs.writeFileSync("./ERK_keys/RSA_private_key", RSA_priv_key );
+    fs.writeFileSync("./ERK_keys/RSA_public_key", rsaKeys[0] );
+    fs.writeFileSync("./ERK_keys/RSA_private_key", rsaKeys[1] );
   } 
 
   if (!fs.existsSync("./ERK_keys/KYBER_private_key")) {
-    fs.writeFileSync("./ERK_keys/KYBER_public_key", KYBER_pub_key() );
-    fs.writeFileSync("./ERK_keys/KYBER_private_key", KYBER_priv_key() );
+    fs.writeFileSync("./ERK_keys/KYBER_public_key", kyberKeys[0] );
+    fs.writeFileSync("./ERK_keys/KYBER_private_key", kyberKeys[1] );
+  }
+
+  if (!fs.existsSync("./ERK_keys/ERK_private_key")) {
+    fs.writeFileSync("./ERK_keys/ERK_public_key", `${eciesKeys[0]},${rsaKeys[0]},${kyberKeys[0]}`);
+    fs.writeFileSync("./ERK_keys/ERK_private_key", `${eciesKeys[1]},${rsaKeys[1]},${kyberKeys[1]}` );
+  }
+}
+
+const requestKeys = (remote_address) => {
+  if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(cli.o[1][0])) {
+    error(`Onion address is not valid, preventing useless request ...`);
+    process.exit(0);
+  } 
+}
+
+/* What Crypto Do You Use */
+const wcdyu = async (remote_address /* || cli */) => {
+  v = true;
+  d = true;
+  verbose(`Starting wcdyu request to ${remote_address} ... `);
+  debug(`Starting wcdyu request to ${remote_address} ... `);
+
+
+  if (remote_address?.o?.[0]?.includes("wcdyu")) { // if this function is called from cli
+    remote_address = remote_address.o?.[1]?.[0]; // set cli provided address
+  }
+  // The server tells you what crypto is he using so you can encrypt using it
+  if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(remote_address)) {
+    error(`Onion address is not valid, preventing useless request ...`);
+    process.exit(0);
+  }
+  
+  let remoteCrypto;
+
+  const usedCrypto = await curl(remote_address, "wcdyu");
+  try {
+    debug(`Parsing response ${usedCrypto} ... `);
+    remoteCrypto = JSON.parse(usedCrypto);
+  } catch(err) {
+    error(err);
+    process.exit(0);
+  }
+ 
+  if (! "use_erk" in remoteCrypto) {
+    error(`Unexpected object response: ${JSON.stringify(remoteCrypto, null, 2)}\n`);
+    process.exit(0);
+  }
+
+  verbose(`Done.`);
+  debug(`wcdyu server response: ${JSON.stringify(remoteCrypto, null, 2)}`);
+  return remoteCrypto;
+}
+ 
+const getPublicKey = async (remote_address /* || cli */) => {
+  v = true;
+  d = true;
+  verbose(`Starting getPublicKey request ... `);
+  debug(`Starting getPublicKey request ... `);
+
+
+  if (remote_address?.o?.[0]?.includes("erk")) { // if this function is called from cli
+    remote_address = remote_address.o?.[1]?.[0]; // set cli provided address
+  }
+  
+  if (! /^(?:[a-z2-7]{16}|[a-z2-7]{56})\.onion$/.test(remote_address)) {
+    error(`Onion address is not valid, preventing useless request ...`);
+    process.exit(0);
+  }
+
+  const remote_erk_key = await curl(remote_address, "crypto");
+  // Check if key is valid: 
+  if (remote_erk_key.length > 3000 && remote_erk_key.length < 5000 && remote_erk_key?.split(",").length === 3) {
+    verbose(`Got the key. Done.`);
+    debug(`Remote Server Key: ${remote_erk_key}`);
+    return remote_erk_key;
+  } else { 
+    error("Remote server didn't provide his ERK key");
+    debug(`Server answer: ${remote_erk_key}`);
+    process.exit(0);
   }
 }
 
@@ -244,7 +333,40 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
       process.exit(0);
     }
 
-    const result = await curl(`${cli.o[1][0]}`, `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`);
+    
+
+    let api = `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`;
+
+    const remoteConfig = await wcdyu(hostname);
+
+    debug(`REMOTE CONFIG: ${JSON.stringify(remoteConfig)}`);
+    if (remoteConfig?.use_erk && (remoteConfig?.add_me?.ecies || remoteConfig?.add_me?.rsa || remoteConfig?.add_me?.crystal_kyber)) {
+      debug(`Using ern for username ... `);
+      // TODO:
+      const [ eciesKey, rsaKey, kyberKey ] = (await getPublicKey(hostname)).split(",");
+      if (remoteConfig?.add_me?.ecies) {
+        // TODO: encrypt username with exies and change api to post and '/'
+        debug(`Encrypting [[${config.username}]] with ECIES`);
+        config.username = JSON.stringify(ECIES_encrypt(config.username, eciesKey));
+      }
+      if (remoteConfig?.add_me?.rsa) {
+        debug(`Encrypting [[${config.username}]] with RSA`);
+        config.username = JSON.stringify(RSA_encrypt(config.username, rsaKey));
+      }
+      if (remoteConfig?.add_me?.crystal_kyber) {
+        debug(`Encrypting [[${config.username}]] with CRYSTAL-KYBER`);
+        config.username = JSON.stringify(await KYBER_encrypt(config.username, kyberKey));
+        debug(`Encrypted Username is; [[${config.username}]].`);
+      }
+      
+      config.username = Buffer.from(config.username).toString("base64");
+      api = `addme -d '{ "alias":"${config.username}", "address":"${hostname}" }' -H 'Content-Type: application/json'`;
+
+
+    } 
+
+
+    const result = await curl(`${cli.o[1][0]}`, api);
     debug(`Result: ${result}`);
   } catch(err) {
     error(`Error on Add() : ${err}`);
@@ -931,6 +1053,12 @@ const generateHiddenServerScript = (config) => {
     import fs from "fs";
     import express from "express";
 
+    import { 
+      ECIES_priv_key, ECIES_pub_key, ECIES_encrypt, ECIES_decrypt,
+      RSA_priv_key, RSA_pub_key, RSA_encrypt, RSA_decrypt,
+      KYBER_priv_key, KYBER_pub_key, KYBER_encrypt, KYBER_decrypt
+    } from "stringmanolo-erk";
+
     const app = express();
     const port = ${config?.hidden_service_port || 9001};
     const address = "${config?.hidden_service_address || "127.0.0.1"}";
@@ -941,15 +1069,83 @@ const generateHiddenServerScript = (config) => {
       res.send("DarkMessenger API");
     });
 
+    app.get("/wcdyu", async (req, res) => {
+      try {
+        const data = await fs.promises.readFile('./config/dark-messenger.json', 'utf8'); 
+        const cryptoUsed = JSON.parse(data)?.dark_messenger_cryptography;
+        return res.status(200).json(cryptoUsed);
+      } catch(err) {
+        console.log(err); // TODO: Error to log
+        return res.status(500).json({ error: 'Unable to read ./config/darkmessenger.json or unable to find "dark_messenger_cryptography" defined in remote server options. This is not your problem. Server owner probably has corrupted configuration or is not using ERN crypto module' });
+      }
+    });
+
+   app.get("/crypto", async (req, res) => {
+     if (fs.existsSync("./ERK_keys/ERK_public_key")) {
+       try {
+         const pubKey = await fs.promises.readFile('./ERK_keys/ERK_public_key');
+         res.status(200).send(pubKey);
+       } catch(err) {
+         res.status(500).send("Error: Unable to read ERK public key");
+       }
+     } else {
+       res.status(404).send("Public Key Not Found In Remote Address");
+     }
+
+   });
+
+/* // Accept all endpoints but encrypted. Done this way to don't reveal what endpoints are being contacted 
+    app.post("/", async (req, res) => {
+      const data = await fs.promises.readFile('./config/dark-messenger.json', 'utf8');
+      const cryptoUsed = JSON.parse(data)?.dark_messenger_cryptography;
+       
+
+    });
+*/
+
     /* Req Example:
      * curl --socks5-hostname 127.0.0.1:9050 http://4akbfdpst32zjwel776hf4ljggdirzopovkgzss74x2h4nxbwsfj7xid.onion:9001/addme -d '{ "alias": "sm", "address": "sm.onion" }' -H "Content-Type: application/json"
     */
-
     if (${config?.allow_addme} === true) {
       app.post('/addme', async (req, res) => {
-        const { alias, address } = req.body;
+        let { alias, address } = req.body;
 
-        if (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(alias)) {
+        if (alias.length > 6000) { //encrypted
+          try {
+            const encryptedAlias = Buffer.from(alias, "base64").toString("utf-8");
+            const eAO = JSON.parse(encryptedAlias); // encryptedAliasObject
+
+            if (! eAO?.KYBER_iv ) {
+              return res.status(500).send("iv not found in b64 decoded encrypted alias:" /*+ JSON.stringify(eAO, null, 2)*/); /* DEBUG ERROR *?
+            }
+            if (fs.existsSync("./ERK_keys/ERK_private_key")) {
+              try {
+                const privKey = await fs.promises.readFile('./ERK_keys/ERK_private_key', 'utf-8');
+             
+                if (privKey.length > 9000 && privKey.length < 11000 && privKey?.split(",").length === 3) {
+                  const [ ECIES_privk, RSA_privk, KYBER_privk ] = privKey.split(",");
+            
+/* TODO: Only use the chosen encryption in config. (right now asumming all 3 encryption modules being used) */
+                  const RSAe = JSON.parse(await KYBER_decrypt(eAO.KYBER_ciphertext, eAO.KYBER_iv, eAO.KYBER_tag, eAO.KYBER_publicKey, KYBER_privk));
+
+                  const ECIESe = JSON.parse(RSA_decrypt(RSAe.RSA_ciphertext, RSAe.RSA_iv, RSAe.RSA_tag, RSAe.RSA_publicKey, RSA_privk));
+
+                  alias = ECIES_decrypt(ECIESe.ciphertext, ECIESe.iv, ECIESe.tag, ECIESe.publicKey, ECIES_privk);
+
+                } else {
+                  return res.status(500).send("Priv key is in wrong format");
+                }
+              } catch(err) { // TODO: DO NOT SEND err TO CLIENT (Here for debug only)
+                return res.status(500).send("Error: Unable to read ERK private key:" /*+ err*/); /* DEBUG ERROR */
+              }
+            } else {
+              return res.status(404).send("Private Key Not Found In Remote Address");
+            }
+
+          } catch(err) { /* TODO: DON'T SEND THE ERROR TO THE CLIENT, HERE FOR DEBUG */
+            return res.status(500).send("Unable to decrypt:" /*+ err*/); /* DEBUG ERROR */
+          }
+        } else if (! /^[a-zA-Z0-9\-_.@]{1,99}$/.test(alias)) {
           console.error(\`Username is not valid\`);
           return res.status(422).send("Username/Alias is not valid");
         }                                                                                
@@ -957,8 +1153,6 @@ const generateHiddenServerScript = (config) => {
           console.error(\`Onion address is not valid, preveting useless request ...\`);
           return res.status(400).send("Onion address dosn't seem valid. Expected a real domain.onion address");
         }
-
-
 
         let addressBook = [];
         try {

@@ -36,6 +36,10 @@
 - Test custom config file passed as arg
 - Add a profile page (optional) by binding a new http service to answer to browsers navigating to the onion url. (Add it in config/dark-messenger.json) (Use a default page showing info about the DarkMessenger project)
 - Add a check to only allow users in the contact list to send you messages (add it to ./config/dark-messenger.json options)
+- Add public keys to the address book
+- Do not answer if keys are set and the hidden_service is queried without crypto
+- Add encryption to the .onion address in addme too
+- Use only configured crypto in ./config/dark-messenger.json (using ERN at the moment)
 
 ### Contribute
 If you want to help out, fork the repo, complete any of this taks, push the changes to your repo, make a pull request.  
