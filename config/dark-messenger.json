@@ -37,7 +37,7 @@
 
 "comment10": "Crypto Settings:",
     "dark_messenger_cryptography": {
-      "use_erk": false,
+      "use_erk": true,
       "offline_messages": {
         "ecies": true,
         "rsa": true,

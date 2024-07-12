@@ -315,7 +315,7 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
     debug(`Loading config...`);
     config = await loadConfig("./config/dark-messenger.json");
     debug(`Loading hostname...`);
-    const hostname = config.hidden_service_hostname = (await loadFile("./hidden_service/hostname")).trim();
+    let hostname = config.hidden_service_hostname = (await loadFile("./hidden_service/hostname")).trim();
     debug(`Extracting onion domain from cli`);
     if (! cli.o?.[1]?.[0] ) {
       error(`Use "./DarkMessenger addme domain.onion" to provide the address of the user you want to add you`);
@@ -348,15 +348,17 @@ const addme = async (cli) => { //TODO: Add Verbose and Debug outputs
         // TODO: encrypt username with exies and change api to post and '/'
         debug(`Encrypting [[${config.username}]] with ECIES`);
         config.username = JSON.stringify(ECIES_encrypt(config.username, eciesKey));
+        //hostname = JSON.stringify(ECIES_encrypt(hostname, eciesKey));
+
       }
       if (remoteConfig?.add_me?.rsa) {
-        debug(`Encrypting [[${config.username}]] with RSA`);
+        //debug(`Encrypting [[${config.username}]] with RSA`);
         config.username = JSON.stringify(RSA_encrypt(config.username, rsaKey));
       }
       if (remoteConfig?.add_me?.crystal_kyber) {
-        debug(`Encrypting [[${config.username}]] with CRYSTAL-KYBER`);
+        //debug(`Encrypting [[${config.username}]] with CRYSTAL-KYBER`);
         config.username = JSON.stringify(await KYBER_encrypt(config.username, kyberKey));
-        debug(`Encrypted Username is; [[${config.username}]].`);
+        //debug(`Encrypted Username is; [[${config.username}]].`);
       }
       
       config.username = Buffer.from(config.username).toString("base64");
