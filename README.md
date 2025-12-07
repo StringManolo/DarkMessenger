@@ -34,7 +34,7 @@ Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/StringManolo/DarkMessenger
 cd DarkMessenger
-npm install
+npm install && npm audit fix
 
 ./DarkMessenger.js
 ```
