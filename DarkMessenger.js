@@ -1118,7 +1118,7 @@ const generateHiddenServerScript = (config) => {
             const eAO = JSON.parse(encryptedAlias); // encryptedAliasObject
 
             if (! eAO?.KYBER_iv ) {
-              return res.status(500).send("iv not found in b64 decoded encrypted alias:" /*+ JSON.stringify(eAO, null, 2)*/); /* DEBUG ERROR *?
+              return res.status(500).send("iv not found in b64 decoded encrypted alias:" /*+ JSON.stringify(eAO, null, 2)*/); /* DEBUG ERROR */
             }
             if (fs.existsSync("./ERK_keys/ERK_private_key")) {
               try {
