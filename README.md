@@ -2,6 +2,9 @@
 
 **DarkMessenger** is a peer-to-peer messaging app that leverages the Tor Network to provide secure and anonymous communication. It bypasses ISP restrictions and CGNAT networks, enabling you to communicate in a decentralized manner without the need for registration or personal information.
 
+![dark_messenger_screenshoot2](https://github.com/user-attachments/assets/89064922-1056-4993-898c-c086dbb57a28)
+
+
 ## Features
 
 - **Anonymous Messaging**: Use Tor hidden services to send and receive messages securely.
